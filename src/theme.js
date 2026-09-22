@@ -1,0 +1,26 @@
+export const light = {
+  bg: "#FAF8F4",
+  surface: "#FFFFFF",
+  soft: "#F3F0EA",
+  ink: "#1B1A17",
+  muted: "#6B6862",
+  line: "#E2DDD3",
+  border: "#CFC8BB",
+  accent: "#1F6F63",
+  accentSoft: "#E3EFEC",
+  danger: "#B63D36",
+  dark: false,
+};
+export const dark = {
+  bg: "#15171B",
+  surface: "#1E2127",
+  soft: "#262A31",
+  ink: "#F2F0EC",
+  muted: "#9DA2AB",
+  line: "#2E323A",
+  border: "#3B414A",
+  accent: "#59BFAC",
+  accentSoft: "#1D2C2A",
+  danger: "#F39389",
+  dark: true,
+};

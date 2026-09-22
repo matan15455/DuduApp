@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700;800&family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; padding: 0; }
+  body { background: #E8E4DC; -webkit-font-smoothing: antialiased; }
+  a { color: #1F6F63; text-decoration: none; }
+  a:hover { color: #14524A; }
+  * { box-sizing: border-box; }
+  button { font: inherit; color: inherit; }
+  input, select, textarea { font: inherit; color: inherit; }
+  [data-theme] {
+    --pagebg: #E8E4DC; --bg: #FAF8F4; --surf: #FFFFFF; --surf2: #F3F0EA;
+    --ink: #1B1A17; --ink2: #6B6862; --line: #E2DDD3; --line2: #CFC8BB;
+    --accent: #1F6F63; --accent-soft: #E3EFEC;
+    --m: #B07A15; --m-bg: #FBF0D8; --a: #C2562F; --a-bg: #FBE5DA;
+    --n: #4351A8; --n-bg: #E4E6F7; --o: #3E7D5E; --o-bg: #E2F0E7;
+    --t: #7A5AA6; --t-bg: #EEE7F7;
+    --shadow: 0 1px 2px rgba(27,26,23,.05), 0 8px 24px rgba(27,26,23,.07);
+  }
+  [data-theme="dark"] {
+    --pagebg: #0C0D10; --bg: #15171B; --surf: #1E2127; --surf2: #262A31;
+    --ink: #F2F0EC; --ink2: #9DA2AB; --line: #2E323A; --line2: #3B414A;
+    --accent: #59BFAC; --accent-soft: #1D2C2A;
+    --m: #E8B35A; --m-bg: #2E2718; --a: #EE8A62; --a-bg: #31201A;
+    --n: #92A0EE; --n-bg: #1E2237; --o: #74C29A; --o-bg: #182720;
+    --t: #B79BE0; --t-bg: #241D31;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 32px rgba(0,0,0,.35);
+  }
+  @keyframes sheetUp { from { transform: translateY(18px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+  @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+</style>
+</helmet>
+
+<div data-theme="{{ theme }}" dir="rtl" style="min-height:100vh;background:var(--pagebg);display:flex;flex-direction:column;align-items:center;gap:16px;padding:24px 14px 36px;font-family:Assistant,'Noto Sans Hebrew',sans-serif;color:var(--ink)">
+
+  <div style="display:flex;align-items:center;gap:10px;width:390px;max-width:100%;justify-content:space-between">
+    <div style="font-size:13px;font-weight:600;color:var(--ink2);letter-spacing:.02em">משמרות — אפליקציה אישית</div>
+    <button onClick="{{ toggleTheme }}" style="border:1px solid var(--line2);background:var(--surf);border-radius:999px;padding:6px 14px;font-size:13px;font-weight:600;cursor:pointer">{{ themeLabel }}</button>
+  </div>
+
+  <div id="phone" style="position:relative;width:min(390px,100%);height:min(844px,calc(100vh - 128px));min-height:600px;background:var(--bg);border-radius:44px;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line);display:flex;flex-direction:column">
+
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 28px 4px;font-family:Rubik,sans-serif;font-size:13px;font-weight:600;color:var(--ink);flex:none">
+      <div>9:41</div>
+      <div style="display:flex;gap:4px;align-items:center">
+        <div style="width:16px;height:9px;border:1.4px solid var(--ink);border-radius:2px;opacity:.8"></div>
+        <div style="width:4px;height:9px;background:var(--ink);border-radius:1px;opacity:.5"></div>
+      </div>
+    </div>
+
+    <div style="flex:1;overflow-y:auto;overflow-x:hidden;padding:0 0 12px">
+
+      <sc-if value="{{ isToday }}" hint-placeholder-val="{{ true }}">
+        <div style="padding:14px 20px 0">
+          <div style="font-size:12px;font-weight:700;color:var(--ink2);letter-spacing:.08em">היום</div>
+          <div style="display:flex;align-items:baseline;gap:8px;margin-top:2px;flex-wrap:wrap">
+            <div style="font-size:22px;font-weight:700">{{ today.dateLong }}</div>
+            <div style="font-size:14px;font-weight:600;color:var(--ink2)">{{ today.heb }}</div>
+          </div>
+
+          <div style="margin-top:14px;background:var(--surf);border:1px solid var(--line);border-radius:28px;padding:22px 22px 20px;box-shadow:var(--shadow)">
+            <div style="display:flex;align-items:center;gap:14px">
+              <div style="{{ today.iconBox }}">
+                <sc-if value="{{ today.isMorning }}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"></circle><path d="M12 2.6v2.4M12 19v2.4M2.6 12H5M19 12h2.4M5.4 5.4l1.7 1.7M16.9 16.9l1.7 1.7M18.6 5.4l-1.7 1.7M7.1 16.9l-1.7 1.7"></path></svg></sc-if>
+                <sc-if value="{{ today.isAfternoon }}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M3.5 17.5h17"></path><circle cx="12" cy="12" r="4"></circle><path d="M12 3.6v1.8M4.6 12.6l1.3-1.3M19.4 12.6l-1.3-1.3M6.6 6.6l1.3 1.3M17.4 6.6l-1.3 1.3"></path></svg></sc-if>
+                <sc-if value="{{ today.isNight }}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M20 14.4A8.4 8.4 0 0 1 9.6 4a8.6 8.6 0 1 0 10.4 10.4z"></path></svg></sc-if>
+                <sc-if value="{{ today.isOff }}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.8 12 4l8 6.8V20H4z"></path><path d="M9.5 20v-5h5v5"></path></svg></sc-if>
+                <sc-if value="{{ today.isTaken }}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.8 12 4l8 6.8V20H4z"></path><path d="M9 16.5h6"></path></svg></sc-if>
+              </div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:34px;font-weight:800;line-height:1.05;letter-spacing:-.01em">{{ today.label }}</div>
+                <div style="font-family:Rubik,sans-serif;font-size:19px;font-weight:500;color:var(--ink2);margin-top:4px;direction:ltr;text-align:right">{{ today.hoursText }}</div>
+              </div>
+            </div>
+
+            <sc-if value="{{ today.hasBadges }}">
+              <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:16px">
+                <sc-for list="{{ today.badges }}" as="b" hint-placeholder-count="1">
+                  <div style="{{ b.style }}">{{ b.text }}</div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ today.crossText }}">
+              <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--line);font-size:14px;font-weight:600;color:var(--ink2);direction:ltr;text-align:right;font-family:Rubik,sans-serif">{{ today.crossText }}</div>
+            </sc-if>
+
+            <sc-if value="{{ today.noteText }}">
+              <div style="margin-top:14px;background:var(--surf2);border-radius:16px;padding:12px 14px;font-size:15px;line-height:1.45;text-wrap:pretty">{{ today.noteText }}</div>
+            </sc-if>
+
+            <div style="display:flex;gap:10px;margin-top:18px">
+              <button onClick="{{ openToday }}" style="flex:1;min-height:52px;border:none;border-radius:18px;background:var(--accent);color:#fff;font-size:17px;font-weight:700;cursor:pointer">ערוך את היום</button>
+              <button onClick="{{ takeOffToday }}" style="flex:1;min-height:52px;border:1px solid var(--line2);border-radius:18px;background:transparent;font-size:17px;font-weight:700;cursor:pointer">{{ today.offBtn }}</button>
+            </div>
+          </div>
+
+          <div style="margin-top:16px;display:flex;align-items:center;gap:12px;background:var(--surf);border:1px solid var(--line);border-radius:22px;padding:14px 18px">
+            <div style="flex:1;min-width:0">
+              <div style="font-size:12px;font-weight:700;color:var(--ink2);letter-spacing:.06em">המשמרת הבאה</div>
+              <div style="font-size:19px;font-weight:700;margin-top:3px">{{ next.when }} · {{ next.label }}</div>
+            </div>
+            <div style="font-family:Rubik,sans-serif;font-size:17px;font-weight:600;color:var(--ink2);direction:ltr">{{ next.hoursText }}</div>
+          </div>
+
+          <div style="margin-top:12px;background:var(--surf);border:1px solid var(--line);border-radius:22px;padding:14px 18px">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div style="font-size:12px;font-weight:700;color:var(--ink2);letter-spacing:.06em">מקום בסבב</div>
+              <div style="font-size:14px;font-weight:700">{{ cycleText }}</div>
+            </div>
+            <div style="display:flex;gap:4px;margin-top:10px">
+              <sc-for list="{{ cycleDots }}" as="d" hint-placeholder-count="16">
+                <div style="{{ d.style }}"></div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="margin-top:12px;background:var(--surf);border:1px solid var(--line);border-radius:22px;padding:8px 6px 6px">
+            <div style="font-size:12px;font-weight:700;color:var(--ink2);letter-spacing:.06em;padding:8px 12px 6px">הימים הקרובים</div>
+            <sc-for list="{{ days7 }}" as="d" hint-placeholder-count="7">
+              <button onClick="{{ d.open }}" style="width:100%;display:flex;align-items:center;gap:12px;background:transparent;border:none;border-top:1px solid var(--line);padding:13px 12px;cursor:pointer;text-align:right">
+                <div style="{{ d.dot }}"></div>
+                <div style="width:74px;font-size:15px;font-weight:700">{{ d.dow }}</div>
+                <div style="flex:1;min-width:0;font-size:15px;font-weight:600;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ d.label }}<span style="opacity:.75">{{ d.holidaySuffix }}</span></div>
+                <sc-if value="{{ d.hasNote }}">
+                  <div style="{{ d.noteDot }}"></div>
+                </sc-if>
+                <div style="font-family:Rubik,sans-serif;font-size:14px;font-weight:500;color:var(--ink2);direction:ltr">{{ d.hoursText }}</div>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isMonth }}">
+        <div style="padding:14px 16px 0">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+            <button onClick="{{ prevMonth }}" style="width:44px;height:44px;border:1px solid var(--line);background:var(--surf);border-radius:14px;cursor:pointer;font-size:18px;font-weight:700">›</button>
+            <div style="text-align:center">
+              <div style="font-size:20px;font-weight:800">{{ monthTitle }}</div>
+              <div style="font-size:13px;font-weight:600;color:var(--ink2)">{{ monthHeb }}</div>
+            </div>
+            <button onClick="{{ nextMonth }}" style="width:44px;height:44px;border:1px solid var(--line);background:var(--surf);border-radius:14px;cursor:pointer;font-size:18px;font-weight:700">‹</button>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:14px">
+            <sc-for list="{{ dowNames }}" as="w" hint-placeholder-count="7">
+              <div style="text-align:center;font-size:12px;font-weight:700;color:var(--ink2);padding-bottom:2px">{{ w.n }}</div>
+            </sc-for>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:2px">
+            <sc-for list="{{ cells }}" as="c" hint-placeholder-count="35">
+              <button onClick="{{ c.open }}" style="{{ c.style }}">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:2px">
+                  <div style="display:flex;align-items:center;gap:3px;min-width:0">
+                    <div style="{{ c.numStyle }}">{{ c.num }}</div>
+                    <sc-if value="{{ c.hasNote }}">
+                      <div style="{{ c.noteDot }}"></div>
+                    </sc-if>
+                  </div>
+                  <div style="{{ c.dot }}"></div>
+                </div>
+                <div style="{{ c.labelStyle }}">{{ c.short }}</div>
+                <div style="font-size:clamp(7px,2.1vw,9px);font-weight:700;color:var(--ink2);line-height:1.15;max-height:21px;overflow:hidden;word-break:break-word">{{ c.sub }}</div>
+              </button>
+            </sc-for>
+          </div>
+
+          <div style="margin-top:16px;background:var(--surf);border:1px solid var(--line);border-radius:20px;padding:12px 14px">
+            <div style="font-size:12px;font-weight:700;color:var(--ink2);letter-spacing:.06em;margin-bottom:10px">מקרא</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px 10px">
+              <sc-for list="{{ legend }}" as="l" hint-placeholder-count="6">
+                <div style="display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600">
+                  <div style="{{ l.dot }}"></div>
+                  <div>{{ l.text }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="margin-top:11px;padding-top:11px;border-top:1px solid var(--line);font-size:12.5px;font-weight:600;color:var(--ink2);line-height:1.5;text-wrap:pretty">לכל סוג יום יש אייקון, טקסט וצבע. מסגרת מודגשת = יום שעודכן ביד. אייקון השורות ליד המספר = יש הערה ליום.</div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isCheck }}">
+        <div style="padding:16px 20px 0">
+          <div style="font-size:26px;font-weight:800">בדיקת תאריך</div>
+          <div style="font-size:15px;font-weight:600;color:var(--ink2);margin-top:4px;text-wrap:pretty">בחר תאריך ותראה מיד אם אתה פנוי או עובד.</div>
+
+          <label style="display:block;margin-top:18px;background:var(--surf);border:1px solid var(--line);border-radius:20px;padding:14px 16px">
+            <div style="font-size:12px;font-weight:700;color:var(--ink2);letter-spacing:.06em">תאריך</div>
+            <input type="date" value="{{ checkValue }}" onChange="{{ setCheck }}" style="width:100%;margin-top:6px;border:none;background:transparent;font-family:Rubik,sans-serif;font-size:22px;font-weight:600;outline:none;min-height:40px" />
+          </label>
+
+          <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+            <sc-for list="{{ checkQuick }}" as="q" hint-placeholder-count="3">
+              <button onClick="{{ q.go }}" style="border:1px solid var(--line2);background:var(--surf);border-radius:999px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;min-height:44px">{{ q.text }}</button>
+            </sc-for>
+          </div>
+
+          <div style="{{ checkCardStyle }}">
+            <div style="font-size:32px;font-weight:800;line-height:1.1">{{ checkAnswer }}</div>
+            <div style="font-size:19px;font-weight:700;margin-top:8px">{{ checkDetail }}</div>
+            <div style="font-family:Rubik,sans-serif;font-size:20px;font-weight:600;margin-top:4px;direction:ltr;text-align:right;color:var(--ink2)">{{ checkHours }}</div>
+            <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:14px;font-weight:600;color:var(--ink2)">{{ checkDateLong }} · {{ checkHeb }}</div>
+            <sc-if value="{{ checkHoliday }}">
+              <div style="margin-top:8px;font-size:15px;font-weight:700;color:var(--accent)">{{ checkHoliday }}</div>
+            </sc-if>
+            <button onClick="{{ openCheckDay }}" style="width:100%;margin-top:16px;min-height:50px;border:1px solid var(--line2);border-radius:16px;background:transparent;font-size:16px;font-weight:700;cursor:pointer">פתח את פרטי היום</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isShare }}">
+        <div style="padding:16px 20px 0">
+          <div style="font-size:26px;font-weight:800">שיתוף המשמרות</div>
+          <div style="font-size:15px;font-weight:600;color:var(--ink2);margin-top:4px;text-wrap:pretty">הטקסט נשלח לכל אפליקציה. אין צורך שמישהו יתקין משהו.</div>
+
+          <div style="font-size:12px;font-weight:700;color:var(--ink2);letter-spacing:.06em;margin-top:18px">טווח</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">
+            <sc-for list="{{ shareRanges }}" as="r" hint-placeholder-count="4">
+              <button onClick="{{ r.pick }}" style="{{ r.style }}">{{ r.text }}</button>
+            </sc-for>
+          </div>
+
+          <sc-if value="{{ shareCustom }}">
+            <div style="display:flex;gap:8px;margin-top:10px">
+              <label style="flex:1;background:var(--surf);border:1px solid var(--line);border-radius:16px;padding:10px 12px">
+                <div style="font-size:11px;font-weight:700;color:var(--ink2)">מתאריך</div>
+                <input type="date" value="{{ shareFrom }}" onChange="{{ setShareFrom }}" style="width:100%;border:none;background:transparent;font-family:Rubik,sans-serif;font-size:15px;font-weight:600;outline:none;min-height:32px" />
+              </label>
+              <label style="flex:1;background:var(--surf);border:1px solid var(--line);border-radius:16px;padding:10px 12px">
+                <div style="font-size:11px;font-weight:700;color:var(--ink2)">עד תאריך</div>
+                <input type="date" value="{{ shareTo }}" onChange="{{ setShareTo }}" style="width:100%;border:none;background:transparent;font-family:Rubik,sans-serif;font-size:15px;font-weight:600;outline:none;min-height:32px" />
+              </label>
+            </div>
+          </sc-if>
+
+          <div style="font-size:12px;font-weight:700;color:var(--ink2);letter-spacing:.06em;margin-top:18px">רמת פירוט</div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button onClick="{{ setDetailFull }}" style="{{ detailFullStyle }}">מפורט · עם שעות</button>
+            <button onClick="{{ setDetailShort }}" style="{{ detailShortStyle }}">קצר</button>
+          </div>
+
+          <div style="margin-top:18px;background:var(--surf);border:1px solid var(--line);border-radius:22px;padding:16px 18px">
+            <div style="font-size:12px;font-weight:700;color:var(--ink2);letter-spacing:.06em">תצוגה מקדימה</div>
+            <div style="margin-top:10px;font-family:Rubik,sans-serif;font-size:14.5px;font-weight:500;line-height:1.85;direction:rtl">
+              <div style="font-weight:700;margin-bottom:6px">{{ shareHeader }}</div>
+              <sc-for list="{{ shareLines }}" as="l" hint-placeholder-count="7">
+                <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ l.text }}</div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;margin-top:14px">
+            <button onClick="{{ doShare }}" style="flex:1;min-height:54px;border:none;border-radius:18px;background:var(--accent);color:#fff;font-size:17px;font-weight:700;cursor:pointer">שתף</button>
+            <button onClick="{{ doCopy }}" style="flex:1;min-height:54px;border:1px solid var(--line2);border-radius:18px;background:transparent;font-size:17px;font-weight:700;cursor:pointer">{{ copyLabel }}</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isSettings }}">
+        <div style="padding:16px 20px 0">
+          <div style="font-size:26px;font-weight:800">הגדרות</div>
+
+          <div style="font-size:12px;font-weight:700;color:var(--ink2);letter-spacing:.06em;margin-top:18px">הסבב שלי</div>
+          <div style="margin-top:8px;background:var(--surf);border:1px solid var(--line);border-radius:22px;overflow:hidden">
+            <sc-for list="{{ cycleRows }}" as="r" hint-placeholder-count="4">
+              <div style="display:flex;align-items:center;gap:10px;padding:13px 16px;border-top:1px solid var(--line)">
+                <div style="{{ r.dot }}"></div>
+                <div style="flex:1;font-size:16px;font-weight:700;min-width:0">{{ r.text }}</div>
+                <div style="font-family:Rubik,sans-serif;font-size:19px;font-weight:600;color:var(--ink2)">{{ r.value }}</div>
+              </div>
+            </sc-for>
+            <label style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:13px 16px;border-top:1px solid var(--line)">
+              <div style="flex:1;font-size:16px;font-weight:700;min-width:120px">תחילת הסבב</div>
+              <input type="date" value="{{ cycleStart }}" onChange="{{ setCycleStart }}" style="border:1px solid var(--line);background:var(--surf2);border-radius:11px;padding:6px 9px;font-family:Rubik,sans-serif;font-size:16px;font-weight:600;outline:none;min-height:44px;max-width:100%" />
+            </label>
+            <div style="padding:10px 16px 14px;border-top:1px solid var(--line);font-size:13px;font-weight:600;color:var(--ink2);line-height:1.5;text-wrap:pretty">{{ cycleNote }} בתאריך זה מתחיל יום ה{{ cycleFirstLabel }} הראשון, והמשך מחושב אוטומטית.</div>
+          </div>
+
+          <div style="font-size:12px;font-weight:700;color:var(--ink2);letter-spacing:.06em;margin-top:18px">שעות ברירת מחדל</div>
+          <div style="margin-top:8px;background:var(--surf);border:1px solid var(--line);border-radius:22px;overflow:hidden">
+            <sc-for list="{{ hourRows }}" as="h" hint-placeholder-count="3">
+              <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-top:1px solid var(--line)">
+                <div style="{{ h.dot }}"></div>
+                <div style="flex:1;font-size:16px;font-weight:700">{{ h.text }}</div>
+                <input type="time" value="{{ h.start }}" onChange="{{ h.setStart }}" style="border:1px solid var(--line);background:var(--surf2);border-radius:10px;padding:6px 8px;font-family:Rubik,sans-serif;font-size:15px;font-weight:600;outline:none;min-height:40px" />
+                <input type="time" value="{{ h.end }}" onChange="{{ h.setEnd }}" style="border:1px solid var(--line);background:var(--surf2);border-radius:10px;padding:6px 8px;font-family:Rubik,sans-serif;font-size:15px;font-weight:600;outline:none;min-height:40px" />
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="font-size:12px;font-weight:700;color:var(--ink2);letter-spacing:.06em;margin-top:18px">תזכורות</div>
+          <div style="margin-top:8px;background:var(--surf);border:1px solid var(--line);border-radius:22px;overflow:hidden">
+            <button onClick="{{ toggleReminder }}" style="width:100%;display:flex;align-items:center;gap:10px;padding:14px 16px;background:transparent;border:none;cursor:pointer;text-align:right">
+              <div style="flex:1;font-size:16px;font-weight:700">תזכורת לפני משמרת</div>
+              <div style="{{ reminderTrack }}"><div style="{{ reminderKnob }}"></div></div>
+            </button>
+            <sc-if value="{{ reminderOn }}">
+              <div style="padding:6px 16px 14px;border-top:1px solid var(--line)">
+                <div style="display:flex;gap:8px;margin:10px 0 0">
+                  <button onClick="{{ setModeBefore }}" style="{{ modeBeforeStyle }}">לפני המשמרת</button>
+                  <button onClick="{{ setModeDay }}" style="{{ modeDayStyle }}">יום לפני, בשעה</button>
+                </div>
+                <sc-if value="{{ isBefore }}" hint-placeholder-val="{{ true }}">
+                  <div style="font-size:13px;font-weight:600;color:var(--ink2);margin:14px 0 8px">כמה זמן לפני שעת ההתחלה?</div>
+                  <div style="display:flex;gap:8px;flex-wrap:wrap">
+                    <sc-for list="{{ leadOptions }}" as="l" hint-placeholder-count="6">
+                      <button onClick="{{ l.pick }}" style="{{ l.style }}">{{ l.text }}</button>
+                    </sc-for>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ isDayBefore }}">
+                  <label style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px;background:var(--surf2);border:1px solid var(--line);border-radius:16px;padding:12px 14px">
+                    <div style="flex:1;font-size:15px;font-weight:700;min-width:120px">יום לפני, בשעה</div>
+                    <input type="time" value="{{ dayBeforeAt }}" onChange="{{ setDayBeforeAt }}" style="border:1px solid var(--line);background:var(--surf);border-radius:11px;padding:7px 9px;font-family:Rubik,sans-serif;font-size:17px;font-weight:600;outline:none;min-height:44px" />
+                  </label>
+                </sc-if>
+                <div style="margin-top:14px;font-size:13px;font-weight:600;color:var(--ink2);line-height:1.55;text-wrap:pretty">{{ reminderSummary }} יום שהפך לחופש — לא תישלח תזכורת.</div>
+              </div>
+            </sc-if>
+          </div>
+
+          <div style="font-size:12px;font-weight:700;color:var(--ink2);letter-spacing:.06em;margin-top:18px">תצוגה</div>
+          <div style="margin-top:8px;background:var(--surf);border:1px solid var(--line);border-radius:22px;overflow:hidden">
+            <button onClick="{{ toggleHeb }}" style="width:100%;display:flex;align-items:center;gap:10px;padding:14px 16px;background:transparent;border:none;cursor:pointer;text-align:right">
+              <div style="flex:1;font-size:16px;font-weight:700">תאריך עברי וחגים</div>
+              <div style="{{ hebTrack }}"><div style="{{ hebKnob }}"></div></div>
+            </button>
+            <div style="padding:14px 16px;border-top:1px solid var(--line)">
+              <div style="font-size:16px;font-weight:700">מצב תצוגה</div>
+              <div style="display:flex;gap:8px;margin-top:10px">
+                <sc-for list="{{ themeOptions }}" as="o" hint-placeholder-count="3">
+                  <button onClick="{{ o.pick }}" style="{{ o.style }}">{{ o.text }}</button>
+                </sc-for>
+              </div>
+            </div>
+            <button onClick="{{ goWidgets }}" style="width:100%;display:flex;align-items:center;gap:10px;padding:14px 16px;border:none;border-top:1px solid var(--line);background:transparent;cursor:pointer;text-align:right">
+              <div style="flex:1;font-size:16px;font-weight:700">ווידג'טים למסך הבית</div>
+              <div style="font-size:18px;font-weight:700;color:var(--ink2)">‹</div>
+            </button>
+          </div>
+
+          <button onClick="{{ clearOverrides }}" style="width:100%;margin-top:14px;min-height:52px;border:1px solid var(--line2);border-radius:18px;background:transparent;font-size:16px;font-weight:700;cursor:pointer;color:var(--ink2)">אפס את כל השינויים הידניים</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isWidgets }}">
+        <div style="padding:16px 20px 0">
+          <button onClick="{{ backSettings }}" style="border:none;background:transparent;font-size:15px;font-weight:700;color:var(--accent);cursor:pointer;padding:6px 0;min-height:44px">› חזרה להגדרות</button>
+          <div style="font-size:26px;font-weight:800;margin-top:4px">ווידג'טים</div>
+          <div style="font-size:15px;font-weight:600;color:var(--ink2);margin-top:4px;text-wrap:pretty">כך זה ייראה על מסך הבית, בלי לפתוח את האפליקציה.</div>
+
+          <div style="margin-top:16px;border-radius:28px;padding:20px 16px;background:linear-gradient(170deg,#2B3A57,#121722 70%);display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;gap:14px;align-items:flex-start">
+              <div style="width:150px;height:150px;border-radius:26px;background:rgba(255,255,255,.14);backdrop-filter:blur(8px);padding:16px;display:flex;flex-direction:column;justify-content:space-between;color:#fff">
+                <div style="font-size:12px;font-weight:700;opacity:.75">המשמרת הבאה</div>
+                <div>
+                  <div style="font-size:28px;font-weight:800;line-height:1.05">{{ w.nextLabel }}</div>
+                  <div style="font-size:15px;font-weight:600;opacity:.85;margin-top:2px">{{ w.nextWhen }}</div>
+                  <div style="font-family:Rubik,sans-serif;font-size:22px;font-weight:600;margin-top:6px;direction:ltr;text-align:right">{{ w.nextStart }}</div>
+                </div>
+              </div>
+              <div style="flex:1;min-width:0;height:150px;border-radius:26px;background:rgba(255,255,255,.14);backdrop-filter:blur(8px);padding:16px;display:flex;flex-direction:column;justify-content:space-between;color:#fff">
+                <div style="font-size:12px;font-weight:700;opacity:.75">היום ומחר</div>
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  <div>
+                    <div style="font-size:12px;font-weight:700;opacity:.7">היום</div>
+                    <div style="font-size:20px;font-weight:800;line-height:1.1">{{ w.todayLabel }}</div>
+                    <div style="font-family:Rubik,sans-serif;font-size:14px;font-weight:500;opacity:.85;direction:ltr;text-align:right">{{ w.todayHours }}</div>
+                  </div>
+                  <div>
+                    <div style="font-size:12px;font-weight:700;opacity:.7">מחר</div>
+                    <div style="font-size:20px;font-weight:800;line-height:1.1">{{ w.tomLabel }}</div>
+                    <div style="font-family:Rubik,sans-serif;font-size:14px;font-weight:500;opacity:.85;direction:ltr;text-align:right">{{ w.tomHours }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style="border-radius:26px;background:rgba(255,255,255,.14);backdrop-filter:blur(8px);padding:16px;color:#fff">
+              <div style="font-size:12px;font-weight:700;opacity:.75;margin-bottom:8px">הימים הקרובים</div>
+              <sc-for list="{{ w.rows }}" as="r" hint-placeholder-count="7">
+                <div style="display:flex;align-items:center;gap:10px;padding:5px 0">
+                  <div style="{{ r.dot }}"></div>
+                  <div style="width:62px;font-size:14px;font-weight:700">{{ r.dow }}</div>
+                  <div style="flex:1;min-width:0;font-size:14px;font-weight:600;opacity:.9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.label }}</div>
+                  <div style="font-family:Rubik,sans-serif;font-size:13px;font-weight:500;opacity:.8;direction:ltr">{{ r.hoursText }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+    </div>
+
+    <div style="flex:none;display:flex;background:var(--surf);border-top:1px solid var(--line);padding:6px 6px 22px">
+      <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="5">
+        <button onClick="{{ t.go }}" style="{{ t.style }}">
+          <div style="{{ t.iconStyle }}">{{ t.glyph }}</div>
+          <div style="font-size:11.5px;font-weight:700">{{ t.text }}</div>
+        </button>
+      </sc-for>
+    </div>
+
+    <sc-if value="{{ sheetOpen }}">
+      <div onClick="{{ closeSheet }}" style="position:absolute;inset:0;background:rgba(10,10,12,.42);animation:fadeIn .16s ease;z-index:5"></div>
+      <div style="position:absolute;left:0;right:0;bottom:0;z-index:6;background:var(--surf);border-radius:30px 30px 0 0;padding:10px 20px 26px;max-height:88%;overflow-y:auto;animation:sheetUp .22s cubic-bezier(.2,.8,.2,1);box-shadow:0 -12px 40px rgba(0,0,0,.18)">
+        <div style="width:42px;height:4px;border-radius:99px;background:var(--line2);margin:2px auto 14px"></div>
+
+        <sc-if value="{{ sheetIsDetails }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
+            <div style="font-size:21px;font-weight:800">{{ sel.dateLong }}</div>
+            <div style="font-size:14px;font-weight:600;color:var(--ink2)">{{ sel.heb }}</div>
+          </div>
+          <sc-if value="{{ sel.holidayName }}">
+            <div style="{{ sel.holidayStyle }}">{{ sel.holidayName }}</div>
+          </sc-if>
+
+          <div style="{{ sel.cardStyle }}">
+            <div style="flex:1;min-width:0">
+              <div style="font-size:28px;font-weight:800;line-height:1.1">{{ sel.label }}</div>
+              <div style="font-family:Rubik,sans-serif;font-size:18px;font-weight:500;color:var(--ink2);margin-top:3px;direction:ltr;text-align:right">{{ sel.hoursText }}</div>
+            </div>
+          </div>
+
+          <sc-if value="{{ sel.hasBadges }}">
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px">
+              <sc-for list="{{ sel.badges }}" as="b" hint-placeholder-count="1">
+                <div style="{{ b.style }}">{{ b.text }}</div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ sel.crossText }}">
+            <div style="margin-top:12px;font-size:14px;font-weight:600;color:var(--ink2);font-family:Rubik,sans-serif;direction:ltr;text-align:right">{{ sel.crossText }}</div>
+          </sc-if>
+
+          <sc-if value="{{ sel.noteText }}">
+            <div style="margin-top:12px;background:var(--surf2);border-radius:16px;padding:12px 14px;font-size:15px;line-height:1.45;text-wrap:pretty">{{ sel.noteText }}</div>
+          </sc-if>
+
+          <div style="display:flex;flex-direction:column;gap:9px;margin-top:18px">
+            <button onClick="{{ goShift }}" style="width:100%;min-height:54px;border:1px solid var(--line2);border-radius:18px;background:transparent;font-size:17px;font-weight:700;cursor:pointer;text-align:right;padding:0 18px">שנה משמרת</button>
+            <sc-if value="{{ sel.isWork }}" hint-placeholder-val="{{ true }}">
+              <button onClick="{{ goHours }}" style="width:100%;min-height:54px;border:1px solid var(--line2);border-radius:18px;background:transparent;font-size:17px;font-weight:700;cursor:pointer;text-align:right;padding:0 18px">שנה שעות ליום הזה</button>
+            </sc-if>
+            <button onClick="{{ markTaken }}" style="width:100%;min-height:54px;border:1px solid var(--line2);border-radius:18px;background:transparent;font-size:17px;font-weight:700;cursor:pointer;text-align:right;padding:0 18px">{{ sel.takenBtn }}</button>
+            <button onClick="{{ goNote }}" style="width:100%;min-height:54px;border:1px solid var(--line2);border-radius:18px;background:transparent;font-size:17px;font-weight:700;cursor:pointer;text-align:right;padding:0 18px">{{ sel.noteBtn }}</button>
+            <sc-if value="{{ sel.changed }}">
+              <button onClick="{{ resetDay }}" style="width:100%;min-height:54px;border:none;border-radius:18px;background:var(--accent);color:#fff;font-size:17px;font-weight:700;cursor:pointer">החזר לפי הסבב</button>
+            </sc-if>
+            <button onClick="{{ closeSheet }}" style="width:100%;min-height:50px;border:none;border-radius:18px;background:transparent;font-size:16px;font-weight:700;color:var(--ink2);cursor:pointer">סגור</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ sheetIsShift }}">
+          <div style="font-size:21px;font-weight:800">שנה משמרת · {{ sel.dateShortLong }}</div>
+          <div style="font-size:14px;font-weight:600;color:var(--ink2);margin-top:4px">השינוי חל רק על היום הזה. הסבב ממשיך כרגיל.</div>
+          <div style="display:flex;flex-direction:column;gap:9px;margin-top:16px">
+            <sc-for list="{{ shiftOptions }}" as="o" hint-placeholder-count="5">
+              <button onClick="{{ o.pick }}" style="{{ o.style }}">
+                <div style="{{ o.dot }}"></div>
+                <div style="flex:1;text-align:right">{{ o.text }}</div>
+                <div style="font-family:Rubik,sans-serif;font-size:15px;font-weight:500;color:var(--ink2);direction:ltr">{{ o.hoursText }}</div>
+              </button>
+            </sc-for>
+            <button onClick="{{ goDetails }}" style="width:100%;min-height:50px;border:none;border-radius:18px;background:transparent;font-size:16px;font-weight:700;color:var(--ink2);cursor:pointer">ביטול</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ sheetIsHours }}">
+          <div style="font-size:21px;font-weight:800">שעות ליום הזה</div>
+          <div style="font-size:14px;font-weight:600;color:var(--ink2);margin-top:4px;text-wrap:pretty">שעות חריגות ל-{{ sel.dateShortLong }} בלבד. שעות {{ sel.label }} הרגילות לא ישתנו.</div>
+          <div style="display:flex;gap:10px;margin-top:16px">
+            <label style="flex:1;background:var(--surf2);border:1px solid var(--line);border-radius:18px;padding:12px 14px">
+              <div style="font-size:12px;font-weight:700;color:var(--ink2)">התחלה</div>
+              <input type="time" value="{{ draftStart }}" onChange="{{ setDraftStart }}" style="width:100%;border:none;background:transparent;font-family:Rubik,sans-serif;font-size:21px;font-weight:600;outline:none;min-height:42px" />
+            </label>
+            <label style="flex:1;background:var(--surf2);border:1px solid var(--line);border-radius:18px;padding:12px 14px">
+              <div style="font-size:12px;font-weight:700;color:var(--ink2)">סיום</div>
+              <input type="time" value="{{ draftEnd }}" onChange="{{ setDraftEnd }}" style="width:100%;border:none;background:transparent;font-family:Rubik,sans-serif;font-size:21px;font-weight:600;outline:none;min-height:42px" />
+            </label>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:9px;margin-top:16px">
+            <button onClick="{{ saveHours }}" style="width:100%;min-height:54px;border:none;border-radius:18px;background:var(--accent);color:#fff;font-size:17px;font-weight:700;cursor:pointer">שמור שעות ליום הזה</button>
+            <button onClick="{{ goDetails }}" style="width:100%;min-height:50px;border:none;border-radius:18px;background:transparent;font-size:16px;font-weight:700;color:var(--ink2);cursor:pointer">ביטול</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ sheetIsNote }}">
+          <div style="font-size:21px;font-weight:800">הערה ל-{{ sel.dateShortLong }}</div>
+          <div style="font-size:14px;font-weight:600;color:var(--ink2);margin-top:4px">ההערה לא משנה את המשמרת ולא נכנסת לשיתוף.</div>
+          <textarea value="{{ draftNote }}" onChange="{{ setDraftNote }}" placeholder="למשל: ביקשו להגיע שעה מאוחר יותר" style="width:100%;margin-top:14px;min-height:110px;border:1px solid var(--line);background:var(--surf2);border-radius:18px;padding:14px;font-size:16px;line-height:1.5;outline:none;resize:none"></textarea>
+          <div style="display:flex;flex-direction:column;gap:9px;margin-top:14px">
+            <button onClick="{{ saveNote }}" style="width:100%;min-height:54px;border:none;border-radius:18px;background:var(--accent);color:#fff;font-size:17px;font-weight:700;cursor:pointer">שמור הערה</button>
+            <button onClick="{{ goDetails }}" style="width:100%;min-height:50px;border:none;border-radius:18px;background:transparent;font-size:16px;font-weight:700;color:var(--ink2);cursor:pointer">ביטול</button>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ toast }}">
+      <div style="position:absolute;left:20px;right:20px;bottom:104px;z-index:20;background:var(--ink);color:var(--bg);border-radius:16px;padding:14px 16px;font-size:15px;font-weight:700;text-align:center;animation:fadeIn .16s ease">{{ toast }}</div>
+    </sc-if>
+  </div>
+
+  <div style="width:390px;max-width:100%;font-size:12.5px;font-weight:600;color:var(--ink2);line-height:1.6;text-wrap:pretty">פרוטוטייפ אינטראקטיבי: לחץ על ימים בלוח, ערוך משמרת ושעות, בדוק תאריך, שתף טקסט, ופתח את ההגדרות והווידג'טים.</div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:420,&quot;height&quot;:960},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;,&quot;system&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;'light' | 'dark' | 'system'&quot;,&quot;section&quot;:&quot;תצוגה&quot;},&quot;reminderLead&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[15,30,60,120,180,480],&quot;default&quot;:60,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;תזכורות&quot;}}">
+const DOW = ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
+const DOW_S = ['א','ב','ג','ד','ה','ו','ש'];
+const META = {
+  morning:   { label:'בוקר',        short:'בוקר', c:'--m', bg:'--m-bg' },
+  afternoon: { label:'צהריים',      short:'צהר׳', c:'--a', bg:'--a-bg' },
+  night:     { label:'לילה',        short:'לילה', c:'--n', bg:'--n-bg' },
+  off:       { label:'חופש בסבב',   short:'חופש', c:'--o', bg:'--o-bg' },
+  taken:     { label:'חופש שנלקח',  short:'ח׳ שנלקח', c:'--t', bg:'--t-bg' }
+};
+const MONTHS_HE = { 'Tishri':'תשרי','Tishrei':'תשרי','Heshvan':'חשוון','Marheshvan':'חשוון','Kislev':'כסלו','Tevet':'טבת','Shevat':'שבט','Adar':'אדר','Adar I':'אדר א׳','Adar II':'אדר ב׳','Nisan':'ניסן','Iyar':'אייר','Sivan':'סיוון','Tamuz':'תמוז','Av':'אב','Elul':'אלול' };
+const GEM = [[400,'ת'],[300,'ש'],[200,'ר'],[100,'ק'],[90,'צ'],[80,'פ'],[70,'ע'],[60,'ס'],[50,'נ'],[40,'מ'],[30,'ל'],[20,'כ'],[10,'י'],[9,'ט'],[8,'ח'],[7,'ז'],[6,'ו'],[5,'ה'],[4,'ד'],[3,'ג'],[2,'ב'],[1,'א']];
+function gem(n) {
+  let r = n, s = '';
+  while (r > 0) {
+    if (r === 15) { s += 'טו'; r = 0; break; }
+    if (r === 16) { s += 'טז'; r = 0; break; }
+    for (let i = 0; i < GEM.length; i++) { if (GEM[i][0] <= r) { s += GEM[i][1]; r -= GEM[i][0]; break; } }
+  }
+  if (!s) return '';
+  if (s.length === 1) return s + '׳';
+  return s.slice(0, -1) + '״' + s.slice(-1);
+}
+const gemYear = (y) => gem(y % 1000);
+const SVG = {
+  morning: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.5 5.5l1.6 1.6M16.9 16.9l1.6 1.6M18.5 5.5l-1.6 1.6M7.1 16.9l-1.6 1.6"/></svg>',
+  afternoon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"><path d="M2.8 18.5h18.4"/><circle cx="12" cy="12.4" r="4"/><path d="M12 3.4v1.8M4.4 12.9 5.8 11.6M19.6 12.9 18.2 11.6M6.4 6.6l1.4 1.3M17.6 6.6l-1.4 1.3"/></svg>',
+  night: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"><path d="M20.2 14.6A8.6 8.6 0 0 1 9.4 3.8a8.8 8.8 0 1 0 10.8 10.8z"/></svg>',
+  off: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.6 10.9 12 3.8l8.4 7.1V20.4H3.6z"/><path d="M9.4 20.4v-5h5.2v5"/></svg>',
+  taken: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.6 10.9 12 3.8l8.4 7.1V20.4H3.6z"/><path d="M8.4 16.2h7.2"/></svg>',
+  note: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.4" stroke-linecap="round"><path d="M5 5.6h14M5 12h14M5 18.4h8"/></svg>'
+};
+const ICONS = {};
+Object.keys(SVG).forEach(k => { ICONS[k] = 'data:image/svg+xml,' + encodeURIComponent(SVG[k]); });
+const maskBg = (key, size, colorVar, extra) => {
+  const u = 'url("' + ICONS[key] + '") center/contain no-repeat';
+  return 'width:' + size + 'px;height:' + size + 'px;flex:none;background:var(' + colorVar + ');-webkit-mask:' + u + ';mask:' + u + (extra || '');
+};
+const iso = (d) => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+const parse = (s) => new Date(s + 'T00:00:00');
+const addDays = (s, n) => { const d = parse(s); d.setDate(d.getDate()+n); return iso(d); };
+const diffDays = (a, b) => Math.round((parse(a) - parse(b)) / 86400000);
+
+class Component extends DCLogic {
+  state = {
+    tab: 'today',
+    themeMode: 'light',
+    sysDark: false,
+    today: '2026-09-22',
+    cycle: { morning:4, afternoon:4, night:4, off:4, start:'2026-09-15', phase:0 },
+    hours: { morning:['06:00','14:00'], afternoon:['14:00','22:00'], night:['22:00','06:00'] },
+    overrides: {
+      '2026-09-25': { type:'taken' },
+      '2026-09-24': { start:'23:00', end:'07:00' },
+      '2026-10-02': { note:'רופא שיניים בבוקר — ביקשתי להגיע ב-08:00' }
+    },
+    reminder: { on:true, mode:'before', lead:60, at:'20:00' },
+    showHeb: true,
+    month: '2026-09',
+    sel: null,
+    sheet: null,
+    draft: { start:'', end:'', note:'' },
+    check: '2026-10-17',
+    shareRange: '7d',
+    shareDetail: 'full',
+    shareFrom: '2026-09-22',
+    shareTo: '2026-09-28',
+    copied: false,
+    onb: 0,
+    toast: ''
+  };
+
+  componentDidMount() {
+    if (this.props.theme) this.setState({ themeMode: this.props.theme });
+    if (typeof this.props.reminderLead === 'number') {
+      this.setState(s => ({ reminder: Object.assign({}, s.reminder, { lead: this.props.reminderLead }) }));
+    }
+    try {
+      this._mq = window.matchMedia('(prefers-color-scheme: dark)');
+      this.setState({ sysDark: this._mq.matches });
+      this._onMq = (e) => this.setState({ sysDark: e.matches });
+      this._mq.addEventListener('change', this._onMq);
+    } catch (e) {}
+  }
+  componentWillUnmount() {
+    if (this._mq && this._onMq) this._mq.removeEventListener('change', this._onMq);
+    clearTimeout(this._tt);
+  }
+  resolvedTheme() {
+    const m = this.state.themeMode;
+    if (m === 'system') return this.state.sysDark ? 'dark' : 'light';
+    return m === 'dark' ? 'dark' : 'light';
+  }
+
+  // ---------- cycle ----------
+  seq() {
+    const c = this.state.cycle, out = [];
+    for (let i=0;i<c.morning;i++) out.push('morning');
+    for (let i=0;i<c.afternoon;i++) out.push('afternoon');
+    for (let i=0;i<c.night;i++) out.push('night');
+    for (let i=0;i<c.off;i++) out.push('off');
+    return out.length ? out : ['off'];
+  }
+  baseType(day) {
+    const s = this.seq();
+    const n = diffDays(day, this.state.cycle.start) + (this.state.cycle.phase || 0);
+    return s[((n % s.length) + s.length) % s.length];
+  }
+  phaseInfo(day) {
+    const s = this.seq(), t = this.baseType(day);
+    const n = ((diffDays(day, this.state.cycle.start) + (this.state.cycle.phase||0)) % s.length + s.length) % s.length;
+    let start = n; while (start > 0 && s[start-1] === t) start--;
+    let total = 0; for (let i=0;i<s.length;i++) if (i>=start && s[i]===t) total++; else if (i>=start) break;
+    return { idx: n - start + 1, total: total, type: t };
+  }
+
+  // ---------- hebrew / holidays ----------
+  hebLong(day) {
+    const p = this.hebParts(day);
+    if (!p.m) return '';
+    return gem(p.d) + ' ב' + (MONTHS_HE[p.m] || p.m) + ' ' + gemYear(p.y);
+  }
+  hebMonthYear(day) {
+    const p = this.hebParts(day);
+    if (!p.m) return '';
+    return (MONTHS_HE[p.m] || p.m) + ' ' + gemYear(p.y);
+  }
+  hebParts(day) {
+    try {
+      const p = new Intl.DateTimeFormat('en-u-ca-hebrew', { day:'numeric', month:'long', year:'numeric' }).formatToParts(parse(day));
+      let m = '', d = 0, y = 0;
+      p.forEach(x => { if (x.type==='month') m = x.value; if (x.type==='day') d = parseInt(x.value,10); if (x.type==='year') y = parseInt(String(x.value).replace(/[^0-9]/g,''),10); });
+      return { m: m, d: d, y: y };
+    } catch (e) { return { m:'', d:0, y:0 }; }
+  }
+  holiday(day) {
+    if (!this.state.showHeb) return null;
+    const p = this.hebParts(day), m = p.m, d = p.d;
+    const H = (name, kind, short) => ({ name: name, kind: kind, short: short || name });
+    if (m === 'Elul' && d === 29) return H('ערב ראש השנה','erev','ערב ר״ה');
+    if (m === 'Tishri') {
+      if (d === 1 || d === 2) return H('ראש השנה','holiday','ר״ה');
+      if (d === 9) return H('ערב יום כיפור','erev','ערב כיפור');
+      if (d === 10) return H('יום כיפור','holiday','כיפור');
+      if (d === 14) return H('ערב סוכות','erev','ערב סוכות');
+      if (d === 15) return H('סוכות','holiday','סוכות');
+      if (d >= 16 && d <= 20) return H('חול המועד סוכות','moed','חוה״מ');
+      if (d === 21) return H('הושענא רבה','moed','הושע״ר');
+      if (d === 22) return H('שמחת תורה','holiday','שמח״ת');
+    }
+    for (let k=0;k<8;k++) {
+      const q = this.hebParts(addDays(day, -k));
+      if (q.m === 'Kislev' && q.d === 25) return H('חנוכה','minor');
+    }
+    if ((m === 'Adar' || m === 'Adar II') && d === 14) return H('פורים','minor');
+    if (m === 'Nisan') {
+      if (d === 14) return H('ערב פסח','erev','ערב פסח');
+      if (d === 15) return H('פסח','holiday');
+      if (d >= 16 && d <= 20) return H('חול המועד פסח','moed','חוה״מ');
+      if (d === 21) return H('שביעי של פסח','holiday','שביעי פסח');
+    }
+    if (m === 'Iyar') {
+      if (d === 4) return H('יום הזיכרון','minor','זיכרון');
+      if (d === 5) return H('יום העצמאות','minor','עצמאות');
+      if (d === 18) return H('ל״ג בעומר','minor');
+    }
+    if (m === 'Sivan') {
+      if (d === 5) return H('ערב שבועות','erev');
+      if (d === 6) return H('שבועות','holiday');
+    }
+    if (m === 'Av' && d === 9) return H('תשעה באב','minor');
+    return null;
+  }
+
+  // ---------- day model ----------
+  info(day) {
+    const o = this.state.overrides[day] || {};
+    const base = this.baseType(day);
+    const type = o.type || base;
+    const isWork = type === 'morning' || type === 'afternoon' || type === 'night';
+    const h = isWork ? this.state.hours[type] : null;
+    const start = isWork ? (o.start || h[0]) : null;
+    const end = isWork ? (o.end || h[1]) : null;
+    const custom = isWork && !!(o.start || o.end) && (o.start !== h[0] || o.end !== h[1]);
+    return {
+      day: day, base: base, type: type, isWork: isWork,
+      meta: META[type], start: start, end: end,
+      hoursText: isWork ? (start + '–' + end) : '—',
+      customHours: custom,
+      typeChanged: !!(o.type && o.type !== base),
+      original: (o.type && o.type !== base) ? META[base].label : null,
+      note: o.note || '',
+      changed: !!(o.type || o.start || o.end),
+      holiday: this.holiday(day)
+    };
+  }
+  dateLong(day) { return new Intl.DateTimeFormat('he-IL', { day:'numeric', month:'long', year:'numeric' }).format(parse(day)); }
+  dateMed(day) { const d = parse(day); return d.getDate() + '.' + (d.getMonth()+1); }
+  dow(day) { return DOW[parse(day).getDay()]; }
+  relDow(day) {
+    const t = this.state.today;
+    if (day === t) return 'היום';
+    if (day === addDays(t,1)) return 'מחר';
+    if (day === addDays(t,2)) return 'מחרתיים';
+    return this.dow(day);
+  }
+  badges(i) {
+    const out = [];
+    const st = (c) => 'display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:7px 13px;font-size:13px;font-weight:700;background:var(' + (c === '--accent' ? '--accent-soft' : c + '-bg') + ');color:var(' + c + ');border:1px solid var(' + c + ')';
+    if (i.customHours) out.push({ text:'שעות חריגות ליום הזה', style: st('--a') });
+    if (i.typeChanged) out.push({ text:'שונה מהסבב · במקור ' + i.original, style: st('--t') });
+    if (i.type === 'off') out.push({ text:'חופש מתוך הסבב', style: st('--o') });
+    if (i.note) out.push({ text:'יש הערה', style: st('--n') });
+    if (i.holiday) out.push({ text: i.holiday.name, style: st('--accent') });
+    return out;
+  }
+  crossText(i) {
+    if (!i.isWork) return '';
+    if (i.start <= i.end) return '';
+    return this.dateMed(i.day) + ' ' + i.start + ' → ' + this.dateMed(addDays(i.day,1)) + ' ' + i.end;
+  }
+  dotStyle(type, size) {
+    return maskBg(type, Math.max(15, (size || 9) + 7), META[type].c, type === 'taken' ? ';opacity:.75' : '');
+  }
+  noteStyle(size) {
+    return maskBg('note', size || 10, '--n', ';opacity:.85');
+  }
+  toastMsg(t) {
+    this.setState({ toast: t });
+    clearTimeout(this._tt);
+    this._tt = setTimeout(() => this.setState({ toast:'' }), 1900);
+  }
+
+  // ---------- actions ----------
+  open(day) { this.setState({ sel: day, sheet: 'details' }); }
+  setOv(day, patch) {
+    this.setState(s => {
+      const ov = Object.assign({}, s.overrides);
+      ov[day] = Object.assign({}, ov[day] || {}, patch);
+      return { overrides: ov };
+    });
+  }
+  shareText() {
+    const r = this.range();
+    const head = 'המשמרות שלי: ' + this.dateMed(r[0]) + '–' + this.dateMed(r[r.length-1]);
+    const lines = r.map(d => this.shareLine(d));
+    return head + '\n\n' + lines.join('\n');
+  }
+  shareLine(day) {
+    const i = this.info(day);
+    const name = i.type === 'taken' ? 'חופש שנלקח' : (i.type === 'off' ? 'חופש' : i.meta.label);
+    const hrs = (this.state.shareDetail === 'full' && i.isWork) ? ' ' + i.start + '–' + i.end : '';
+    return this.dateMed(day) + ' — ' + name + hrs;
+  }
+  range() {
+    const s = this.state, t = s.today;
+    let from = t, to = addDays(t,6);
+    if (s.shareRange === 'week') { const d = parse(t); from = addDays(t, -d.getDay()); to = addDays(from, 6); }
+    if (s.shareRange === 'month') {
+      const d = parse(t);
+      from = iso(new Date(d.getFullYear(), d.getMonth(), 1));
+      to = iso(new Date(d.getFullYear(), d.getMonth()+1, 0));
+    }
+    if (s.shareRange === 'custom') { from = s.shareFrom; to = s.shareTo; }
+    const out = []; let cur = from, guard = 0;
+    while (diffDays(cur, to) <= 0 && guard++ < 70) { out.push(cur); cur = addDays(cur,1); }
+    return out.length ? out : [from];
+  }
+
+  renderVals() {
+    const S = this.state;
+    const T = S.today;
+    const ti = this.info(T);
+    const pill = (on) => 'border:1px solid ' + (on ? 'var(--accent)' : 'var(--line2)') + ';background:' + (on ? 'var(--accent-soft)' : 'var(--surf)') + ';color:' + (on ? 'var(--accent)' : 'var(--ink)') + ';border-radius:999px;padding:11px 16px;font-size:14.5px;font-weight:700;cursor:pointer;min-height:46px';
+    const row = (on) => 'width:100%;display:flex;align-items:center;gap:12px;min-height:58px;padding:0 18px;border-radius:18px;cursor:pointer;font-size:17px;font-weight:700;border:1px solid ' + (on ? 'var(--accent)' : 'var(--line2)') + ';background:' + (on ? 'var(--accent-soft)' : 'transparent');
+    const track = (on) => 'width:50px;height:30px;border-radius:99px;background:' + (on ? 'var(--accent)' : 'var(--line2)') + ';padding:3px;display:flex;justify-content:' + (on ? 'flex-start' : 'flex-end') + ';transition:background .18s';
+    const knob = 'width:24px;height:24px;border-radius:99px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3)';
+
+    // next shift
+    let nd = null;
+    for (let k=1;k<=40;k++) { const d = addDays(T,k); if (this.info(d).isWork) { nd = d; break; } }
+    const ni = nd ? this.info(nd) : null;
+
+    // days 7
+    const days7 = [];
+    for (let k=0;k<7;k++) {
+      const d = addDays(T,k), i = this.info(d);
+      days7.push({
+        dow: this.relDow(d), label: i.meta.label, hoursText: i.hoursText,
+        holidaySuffix: i.holiday ? ' · ' + i.holiday.name : '',
+        dot: this.dotStyle(i.type, 10),
+        hasNote: !!i.note, noteDot: this.noteStyle(12),
+        open: () => this.open(d)
+      });
+    }
+
+    // month grid
+    const mp = S.month.split('-'), my = +mp[0], mm = +mp[1]-1;
+    const first = new Date(my, mm, 1), last = new Date(my, mm+1, 0);
+    const cells = [];
+    for (let k=0;k<first.getDay();k++) cells.push({ blank:true });
+    for (let d=1; d<=last.getDate(); d++) {
+      const day = iso(new Date(my, mm, d)), i = this.info(day);
+      const isT = day === T;
+      cells.push({
+        blank: false, day: day, num: d, i: i, isT: isT
+      });
+    }
+    while (cells.length % 7 !== 0) cells.push({ blank:true });
+    const cellsOut = cells.map(c => {
+      if (c.blank) return { style:'border:none;background:transparent;min-height:66px', numStyle:'', labelStyle:'', dot:'display:none', num:'', short:'', sub:'', hasNote:false, noteDot:'display:none', open:()=>{} };
+      const i = c.i;
+      return {
+        num: c.num,
+        hasNote: !!i.note,
+        noteDot: this.noteStyle(10),
+        short: i.meta.short,
+        sub: i.holiday ? i.holiday.short : '',
+        dot: this.dotStyle(i.type, 8),
+        numStyle: 'font-family:Rubik,sans-serif;font-size:clamp(11px,3.2vw,14px);font-weight:' + (c.isT ? '700' : '500') + ';color:' + (c.isT ? '#fff' : 'var(--ink)') + ';' + (c.isT ? 'background:var(--ink);border-radius:8px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;margin:-2px;flex:none' : ''),
+        labelStyle: 'font-size:clamp(8px,2.6vw,10.5px);font-weight:800;color:var(' + i.meta.c + ');line-height:1.15;overflow:hidden;white-space:nowrap;text-overflow:ellipsis',
+        style: 'display:flex;flex-direction:column;justify-content:space-between;gap:2px;min-height:66px;min-width:0;overflow:hidden;padding:5px;text-align:right;cursor:pointer;border-radius:13px;background:var(' + i.meta.bg + ');border:' + (i.changed ? '2px solid var(' + i.meta.c + ')' : '1px solid var(--line)'),
+        open: () => this.open(c.day)
+      };
+    });
+
+    // selection
+    const selDay = S.sel;
+    const si = selDay ? this.info(selDay) : null;
+    const sel = si ? {
+      dateLong: this.dateLong(selDay),
+      dateShortLong: this.dateMed(selDay),
+      heb: S.showHeb ? this.hebLong(selDay) : '',
+      label: si.meta.label,
+      hoursText: si.hoursText,
+      badges: this.badges(si),
+      hasBadges: this.badges(si).length > 0,
+      crossText: this.crossText(si),
+      noteText: si.note,
+      noteBtn: si.note ? 'ערוך הערה' : 'הוסף הערה',
+      takenBtn: si.type === 'taken' ? 'בטל את החופש שנלקח' : 'סמן כחופש שנלקח',
+      changed: si.changed,
+      isWork: si.isWork,
+      holidayName: si.holiday ? si.holiday.name : '',
+      holidayStyle: 'display:inline-block;margin-top:8px;font-size:15px;font-weight:700;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:6px 14px',
+      cardStyle: 'display:flex;align-items:center;gap:12px;margin-top:14px;background:var(' + si.meta.bg + ');border:1px solid var(' + si.meta.c + ');border-radius:22px;padding:18px'
+    } : null;
+
+    const shiftOptions = ['morning','afternoon','night','off','taken'].map(t => {
+      const h = this.state.hours[t];
+      return {
+        text: t === 'off' ? 'חופש (כמו בסבב)' : META[t].label,
+        hoursText: h ? h[0] + '–' + h[1] : '',
+        dot: this.dotStyle(t, 12),
+        style: row(si && si.type === t),
+        pick: () => {
+          const base = this.baseType(selDay);
+          this.setState(s => {
+            const ov = Object.assign({}, s.overrides);
+            const cur = Object.assign({}, ov[selDay] || {});
+            if (t === base) { delete cur.type; } else { cur.type = t; }
+            delete cur.start; delete cur.end;
+            if (Object.keys(cur).length) ov[selDay] = cur; else delete ov[selDay];
+            return { overrides: ov, sheet: 'details' };
+          });
+          this.toastMsg(t === 'taken' ? 'סומן כחופש שנלקח' : 'המשמרת עודכנה ליום הזה');
+        }
+      };
+    });
+
+    // check
+    const ci = this.info(S.check);
+    const checkFree = !ci.isWork;
+    const checkQuick = [
+      { text:'מחר', off:1 }, { text:'בעוד שבוע', off:7 }, { text:'בעוד חודש', off:30 }
+    ].map(q => ({ text: q.text, go: () => this.setState({ check: addDays(T, q.off) }) }));
+
+    // share
+    const r = this.range();
+    const lines = r.map(d => ({ text: this.shareLine(d) }));
+
+    // settings rows
+    const cycleRows = [
+      { key:'morning', text:'ימי בוקר' }, { key:'afternoon', text:'ימי צהריים' },
+      { key:'night', text:'ימי לילה' }, { key:'off', text:'ימי חופש' }
+    ].map(c => ({
+      text: c.text, value: S.cycle[c.key], dot: this.dotStyle(c.key === 'off' ? 'off' : c.key, 11)
+    }));
+    const hourRows = ['morning','afternoon','night'].map(t => ({
+      text: 'משמרת ' + META[t].label, dot: this.dotStyle(t, 11),
+      start: S.hours[t][0], end: S.hours[t][1],
+      setStart: (e) => { const v = e.target.value; this.setState(s => ({ hours: Object.assign({}, s.hours, { [t]: [v, s.hours[t][1]] }) })); },
+      setEnd: (e) => { const v = e.target.value; this.setState(s => ({ hours: Object.assign({}, s.hours, { [t]: [s.hours[t][0], v] }) })); }
+    }));
+    const leads = [
+      { v:15, t:'15 דקות לפני' }, { v:30, t:'30 דקות לפני' }, { v:60, t:'שעה לפני' },
+      { v:120, t:'שעתיים לפני' }, { v:180, t:'שלוש שעות לפני' }, { v:480, t:'שמונה שעות לפני' }
+    ];
+    const R = S.reminder;
+    const isBefore = R.mode !== 'dayBefore';
+    const leadText = (leads.filter(l => l.v === R.lead)[0] || { t:'שעה לפני' }).t;
+
+    // widgets
+    const tom = addDays(T,1), tomI = this.info(tom);
+    const w = {
+      nextLabel: ni ? ni.meta.label : 'חופש',
+      nextWhen: nd ? this.relDow(nd) : '',
+      nextStart: ni ? ni.start : '',
+      todayLabel: ti.type === 'taken' ? 'חופש שנלקח' : ti.meta.label,
+      todayHours: ti.hoursText,
+      tomLabel: tomI.type === 'taken' ? 'חופש שנלקח' : tomI.meta.label,
+      tomHours: tomI.hoursText,
+      rows: days7.map(d => ({ dow: d.dow, label: d.label, hoursText: d.hoursText, dot: d.dot.replace(/var\(--[a-z]+\)/g, '#fff') }))
+    };
+
+    const tabs = [
+      { k:'today', text:'היום', glyph:'●' },
+      { k:'month', text:'לוח', glyph:'▦' },
+      { k:'check', text:'בדיקה', glyph:'?' },
+      { k:'share', text:'שיתוף', glyph:'↗' },
+      { k:'settings', text:'הגדרות', glyph:'☰' }
+    ].map(t => {
+      const on = S.tab === t.k || (t.k === 'settings' && S.tab === 'widgets');
+      return {
+        text: t.text, glyph: t.glyph,
+        iconStyle: 'font-size:17px;line-height:1;font-weight:700;opacity:' + (on ? '1' : '.7'),
+        style: 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-height:56px;border:none;border-radius:16px;cursor:pointer;background:' + (on ? 'var(--accent-soft)' : 'transparent') + ';color:' + (on ? 'var(--accent)' : 'var(--ink2)'),
+        go: () => this.setState({ tab: t.k })
+      };
+    });
+
+    const ph = this.phaseInfo(T);
+
+    return {
+      theme: this.resolvedTheme(),
+      themeLabel: S.themeMode === 'system' ? 'לפי המערכת' : (this.resolvedTheme() === 'dark' ? 'מצב כהה' : 'מצב בהיר'),
+      toggleTheme: () => this.setState(s => ({ themeMode: s.themeMode === 'light' ? 'dark' : (s.themeMode === 'dark' ? 'system' : 'light') })),
+      themeOptions: [
+        { k:'light', t:'בהיר' }, { k:'dark', t:'כהה' }, { k:'system', t:'לפי המערכת' }
+      ].map(o => ({
+        text: o.t,
+        style: 'flex:1;min-height:46px;border-radius:14px;cursor:pointer;font-size:14.5px;font-weight:700;border:1px solid ' + (S.themeMode === o.k ? 'var(--accent)' : 'var(--line2)') + ';background:' + (S.themeMode === o.k ? 'var(--accent-soft)' : 'transparent') + ';color:' + (S.themeMode === o.k ? 'var(--accent)' : 'var(--ink)'),
+        pick: () => this.setState({ themeMode: o.k })
+      })),
+      isToday: S.tab === 'today', isMonth: S.tab === 'month', isCheck: S.tab === 'check',
+      isShare: S.tab === 'share', isSettings: S.tab === 'settings', isWidgets: S.tab === 'widgets',
+      tabs: tabs,
+      toast: S.toast,
+
+      today: {
+        dateLong: this.dateLong(T),
+        heb: S.showHeb ? this.hebLong(T) : '',
+        label: ti.type === 'taken' ? 'חופש שנלקח' : ti.meta.label,
+        hoursText: ti.isWork ? ti.hoursText : (ti.type === 'taken' ? 'לא עובד היום' : 'יום מנוחה'),
+        isMorning: ti.type === 'morning', isAfternoon: ti.type === 'afternoon',
+        isNight: ti.type === 'night', isOff: ti.type === 'off', isTaken: ti.type === 'taken',
+        iconBox: 'width:64px;height:64px;border-radius:20px;flex:none;display:flex;align-items:center;justify-content:center;background:var(' + ti.meta.bg + ');color:var(' + ti.meta.c + ');border:1px solid var(' + ti.meta.c + ')',
+        badges: this.badges(ti), hasBadges: this.badges(ti).length > 0,
+        crossText: this.crossText(ti),
+        noteText: ti.note,
+        offBtn: ti.type === 'taken' ? 'בטל חופש' : 'קח חופש היום'
+      },
+      openToday: () => this.open(T),
+      takeOffToday: () => {
+        const cur = this.info(T);
+        if (cur.type === 'taken') {
+          this.setState(s => { const ov = Object.assign({}, s.overrides); const c2 = Object.assign({}, ov[T]||{}); delete c2.type; if (Object.keys(c2).length) ov[T]=c2; else delete ov[T]; return { overrides: ov }; });
+          this.toastMsg('היום חזר לפי הסבב');
+        } else {
+          this.setOv(T, { type:'taken' });
+          this.toastMsg('היום סומן כחופש שנלקח');
+        }
+      },
+      next: { when: nd ? this.relDow(nd) : '—', label: ni ? ni.meta.label : 'אין משמרת בטווח', hoursText: ni ? ni.hoursText : '' },
+      cycleText: ti.type === 'taken' || ti.typeChanged ? 'שונה מהסבב · לפי הסבב ' + META[ti.base].label : 'יום ' + ph.idx + ' מתוך ' + ph.total + ' · ' + META[ph.type].label,
+      cycleDots: this.seq().map((t, k) => {
+        const n = ((diffDays(T, S.cycle.start) + (S.cycle.phase||0)) % this.seq().length + this.seq().length) % this.seq().length;
+        return { style: 'flex:1;height:8px;border-radius:99px;background:var(' + META[t].c + ');opacity:' + (k === n ? '1' : '.28') + (k === n ? ';box-shadow:0 0 0 2px var(--surf),0 0 0 3.5px var(' + META[t].c + ')' : '') };
+      }),
+      days7: days7,
+
+      monthTitle: new Intl.DateTimeFormat('he-IL', { month:'long', year:'numeric' }).format(first),
+      monthHeb: S.showHeb ? (MONTHS_HE[this.hebParts(iso(first)).m] || '') + ' – ' + this.hebMonthYear(iso(last)) : '',
+      prevMonth: () => this.setState({ month: iso(new Date(my, mm-1, 1)).slice(0,7) }),
+      nextMonth: () => this.setState({ month: iso(new Date(my, mm+1, 1)).slice(0,7) }),
+      dowNames: DOW_S.map(n => ({ n: n })),
+      cells: cellsOut,
+      legend: ['morning','afternoon','night','off','taken'].map(t => ({ text: META[t].label, dot: this.dotStyle(t, 11) }))
+        .concat([{ text: 'יש הערה ליום', dot: this.noteStyle(14) }]),
+
+      checkValue: S.check,
+      setCheck: (e) => this.setState({ check: e.target.value }),
+      checkQuick: checkQuick,
+      checkAnswer: checkFree ? 'אתה פנוי' : 'יש לך משמרת',
+      checkDetail: ci.type === 'taken' ? 'חופש שנלקח' : (ci.type === 'off' ? 'חופש בסבב' : ci.meta.label),
+      checkHours: ci.isWork ? ci.hoursText : '',
+      checkDateLong: this.dateLong(S.check),
+      checkHeb: S.showHeb ? this.hebLong(S.check) : '',
+      checkHoliday: ci.holiday ? ci.holiday.name : '',
+      checkCardStyle: 'margin-top:18px;border-radius:26px;padding:22px;background:var(' + ci.meta.bg + ');border:1px solid var(' + ci.meta.c + ')',
+      openCheckDay: () => this.setState({ tab:'month', month: S.check.slice(0,7), sel: S.check, sheet:'details' }),
+
+      shareRanges: [
+        { k:'7d', t:'7 הימים הקרובים' }, { k:'week', t:'השבוע הנוכחי' },
+        { k:'month', t:'החודש הנוכחי' }, { k:'custom', t:'טווח ידני' }
+      ].map(o => ({ text: o.t, style: pill(S.shareRange === o.k), pick: () => this.setState({ shareRange: o.k, copied:false }) })),
+      shareCustom: S.shareRange === 'custom',
+      shareFrom: S.shareFrom, shareTo: S.shareTo,
+      setShareFrom: (e) => this.setState({ shareFrom: e.target.value }),
+      setShareTo: (e) => this.setState({ shareTo: e.target.value }),
+      setDetailFull: () => this.setState({ shareDetail:'full', copied:false }),
+      setDetailShort: () => this.setState({ shareDetail:'short', copied:false }),
+      detailFullStyle: pill(S.shareDetail === 'full') + ';flex:1',
+      detailShortStyle: pill(S.shareDetail === 'short') + ';flex:1',
+      shareHeader: 'המשמרות שלי: ' + this.dateMed(r[0]) + '–' + this.dateMed(r[r.length-1]),
+      shareLines: lines,
+      copyLabel: S.copied ? 'הועתק ✓' : 'העתק ללוח',
+      doCopy: () => {
+        const t2 = this.shareText();
+        if (navigator.clipboard) navigator.clipboard.writeText(t2).catch(()=>{});
+        this.setState({ copied:true });
+        this.toastMsg('הטקסט הועתק');
+      },
+      doShare: () => {
+        const t2 = this.shareText();
+        if (navigator.share) navigator.share({ text: t2 }).catch(()=>{});
+        else this.toastMsg('נפתח חלון השיתוף של המכשיר');
+      },
+
+      cycleRows: cycleRows,
+      cycleStart: S.cycle.start,
+      setCycleStart: (e) => { const v = e.target.value; if (v) this.setState(s => ({ cycle: Object.assign({}, s.cycle, { start: v }) })); },
+      cycleFirstLabel: META[this.baseType(S.cycle.start)].label,
+      cycleSummary: [['morning','בוקר'],['afternoon','צהריים'],['night','לילה'],['off','חופש']].filter(x => S.cycle[x[0]] > 0).map(x => S.cycle[x[0]] + ' ' + x[1]).join(', '),
+      hourRows: hourRows,
+      reminderOn: R.on,
+      toggleReminder: () => this.setState(s => ({ reminder: Object.assign({}, s.reminder, { on: !s.reminder.on }) })),
+      reminderTrack: track(R.on), reminderKnob: knob,
+      modeBeforeStyle: pill(isBefore) + ';flex:1',
+      modeDayStyle: pill(!isBefore) + ';flex:1',
+      setModeBefore: () => this.setState(s => ({ reminder: Object.assign({}, s.reminder, { mode:'before' }) })),
+      setModeDay: () => this.setState(s => ({ reminder: Object.assign({}, s.reminder, { mode:'dayBefore' }) })),
+      isBefore: isBefore,
+      isDayBefore: !isBefore,
+      dayBeforeAt: R.at,
+      setDayBeforeAt: (e) => { const v = e.target.value; this.setState(s => ({ reminder: Object.assign({}, s.reminder, { at: v }) })); },
+      leadOptions: leads.map(l => ({ text: l.t, style: pill(isBefore && R.lead === l.v), pick: () => this.setState(s => ({ reminder: Object.assign({}, s.reminder, { lead: l.v, mode:'before' }) })) })),
+      reminderSummary: R.on
+        ? (isBefore
+            ? 'תקבל תזכורת ' + leadText + ' שעת ההתחלה בפועל. למשמרת ' + (ni ? ni.meta.label + ' ב-' + ni.start : 'הבאה') + ' — התזכורת תישלח בהתאם.'
+            : 'תקבל תזכורת יום לפני המשמרת בשעה ' + R.at + '.')
+        : 'תזכורות כבויות.',
+      toggleHeb: () => this.setState(s => ({ showHeb: !s.showHeb })),
+      hebTrack: track(S.showHeb), hebKnob: knob,
+      goWidgets: () => this.setState({ tab:'widgets' }),
+      backSettings: () => this.setState({ tab:'settings' }),
+      clearOverrides: () => { this.setState({ overrides: {} }); this.toastMsg('כל השינויים הידניים אופסו'); },
+
+      w: w,
+
+      sheetOpen: !!S.sheet && !!sel,
+      sheetIsDetails: S.sheet === 'details', sheetIsShift: S.sheet === 'shift',
+      sheetIsHours: S.sheet === 'hours', sheetIsNote: S.sheet === 'note',
+      sel: sel,
+      closeSheet: () => this.setState({ sheet: null }),
+      goDetails: () => this.setState({ sheet: 'details' }),
+      goShift: () => this.setState({ sheet: 'shift' }),
+      goHours: () => this.setState({ sheet: 'hours', draft: { start: (si && si.start) || '08:00', end: (si && si.end) || '16:00', note: S.draft.note } }),
+      goNote: () => this.setState({ sheet: 'note', draft: Object.assign({}, S.draft, { note: (si && si.note) || '' }) }),
+      shiftOptions: shiftOptions,
+      draftStart: S.draft.start, draftEnd: S.draft.end, draftNote: S.draft.note,
+      setDraftStart: (e) => { const v = e.target.value; this.setState(s => ({ draft: Object.assign({}, s.draft, { start: v }) })); },
+      setDraftEnd: (e) => { const v = e.target.value; this.setState(s => ({ draft: Object.assign({}, s.draft, { end: v }) })); },
+      setDraftNote: (e) => { const v = e.target.value; this.setState(s => ({ draft: Object.assign({}, s.draft, { note: v }) })); },
+      saveHours: () => {
+        if (!si || !si.isWork) { this.toastMsg('אין שעות ליום חופש'); this.setState({ sheet:'details' }); return; }
+        this.setOv(selDay, { start: S.draft.start, end: S.draft.end });
+        this.setState({ sheet:'details' });
+        this.toastMsg('השעות עודכנו ליום הזה בלבד');
+      },
+      saveNote: () => {
+        this.setState(s => {
+          const ov = Object.assign({}, s.overrides);
+          const c2 = Object.assign({}, ov[selDay] || {});
+          if (s.draft.note.trim()) c2.note = s.draft.note.trim(); else delete c2.note;
+          if (Object.keys(c2).length) ov[selDay] = c2; else delete ov[selDay];
+          return { overrides: ov, sheet:'details' };
+        });
+        this.toastMsg('ההערה נשמרה');
+      },
+      markTaken: () => {
+        if (!si) return;
+        if (si.type === 'taken') {
+          this.setState(s => { const ov = Object.assign({}, s.overrides); const c2 = Object.assign({}, ov[selDay]||{}); delete c2.type; if (Object.keys(c2).length) ov[selDay]=c2; else delete ov[selDay]; return { overrides: ov, sheet:'details' }; });
+          this.toastMsg('החופש בוטל');
+        } else {
+          this.setOv(selDay, { type:'taken' });
+          this.setState({ sheet:'details' });
+          this.toastMsg('סומן כחופש שנלקח · המשמרת המקורית נשמרה');
+        }
+      },
+      resetDay: () => {
+        this.setState(s => { const ov = Object.assign({}, s.overrides); const c2 = Object.assign({}, ov[selDay]||{}); const note = c2.note; const n2 = note ? { note: note } : null; if (n2) ov[selDay] = n2; else delete ov[selDay]; return { overrides: ov, sheet:'details' }; });
+        this.toastMsg('היום חזר לפי הסבב');
+      },
+
+      cycleNote: 'הסבב קבוע: ' + this.seq().length + ' ימים שחוזרים על עצמם. אפשר לשנות רק את תאריך ההתחלה.'
+    };
+  }
+}
+
+</script>
+</body>
+</html>
