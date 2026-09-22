@@ -6,9 +6,8 @@ import Feather from "@expo/vector-icons/Feather";
 import { useApp } from "../../state/AppProvider";
 import { T } from "../../components/ui";
 const tabs = {
-  index: ["היום", "sun"],
-  calendar: ["לוח", "calendar"],
-  check: ["בדיקה", "search"],
+  index: ["לוח", "calendar"],
+  check: ["האם אני פנוי", "search"],
   share: ["שיתוף", "share"],
   settings: ["הגדרות", "settings"],
 };
@@ -78,11 +77,11 @@ export default function TabLayout() {
   if (!data.configured) return <Redirect href="/onboarding" />;
   return (
     <Tabs
+      initialRouteName="index"
       tabBar={(props) => <TabBar {...props} />}
       screenOptions={{ headerShown: false }}
     >
       <Tabs.Screen name="index" />
-      <Tabs.Screen name="calendar" />
       <Tabs.Screen name="check" />
       <Tabs.Screen name="share" />
       <Tabs.Screen name="settings" />

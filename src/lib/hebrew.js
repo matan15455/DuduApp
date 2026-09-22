@@ -36,6 +36,7 @@ export function holiday(day) {
         "Lag BaOmer": "ל״ג בעומר",
       };
       label = names[name] || label;
+      if (/^Rosh Hashana/.test(name)) label = "ראש השנה";
       if (/Sukkot.*CH/.test(name)) label = "חול המועד סוכות";
       if (/Sukkot.*Hoshana/.test(name)) label = "הושענא רבה";
       if (/Sukkot I$/.test(name)) label = "סוכות";

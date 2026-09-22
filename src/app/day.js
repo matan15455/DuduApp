@@ -72,18 +72,14 @@ export default function Day() {
                 }}
               />
             )}
-            {(info.work || info.type === "taken") && (
+            {(info.work || (info.type === "off" && info.typeChanged)) && (
               <Button
-                title={
-                  info.type === "taken"
-                    ? "בטל את החופש שנלקח"
-                    : "סמן כחופש שנלקח"
-                }
+                title={info.type === "off" ? "בטל חופש" : "סמן כחופש"}
                 onPress={() => {
                   editDay(day, (o) =>
-                    info.type === "taken"
+                    info.type === "off"
                       ? resetOverride(o)
-                      : { note: o.note, type: "taken" },
+                      : { note: o.note, type: "off" },
                   );
                   done("היום עודכן");
                 }}
@@ -111,13 +107,7 @@ export default function Day() {
         {mode === "shift" && (
           <>
             <T muted>השינוי חל רק על היום הזה. הסבב ממשיך כרגיל.</T>
-            {TYPES.filter(
-              (type) =>
-                type !== "taken" ||
-                info.base !== "off" ||
-                info.work ||
-                info.type === "taken",
-            ).map((type) => (
+            {TYPES.map((type) => (
               <Card key={type} style={{ padding: 0 }}>
                 <Button
                   icon={META[type].icon}
@@ -207,7 +197,16 @@ export default function Day() {
           </>
         )}
         {mode !== "details" && (
-          <Button title="ביטול" onPress={() => setMode("details")} />
+          <Button
+            title="חזור ללא שינוי"
+            icon="arrow-right"
+            onPress={() => setMode("details")}
+            style={{
+              backgroundColor: theme.soft,
+              borderColor: "transparent",
+              marginTop: 12,
+            }}
+          />
         )}
       </Screen>
     </KeyboardAvoidingView>

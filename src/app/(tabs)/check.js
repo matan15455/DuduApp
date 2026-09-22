@@ -12,7 +12,7 @@ export default function Check() {
     info = dayInfo(data, day);
   return (
     <Screen
-      title="בדיקת תאריך"
+      title="האם אני פנוי"
       subtitle="בחר תאריך ותראה מיד אם אתה פנוי או עובד."
     >
       <Card>

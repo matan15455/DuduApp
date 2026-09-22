@@ -127,16 +127,24 @@ export function Screen({
   title = "",
   subtitle = "",
   style = undefined,
+  scroll = true,
+  footer = undefined,
 }) {
   const { theme, error, retrySave } = useApp();
+  const Content = scroll ? ScrollView : View;
   return (
     <SafeAreaView
       edges={["top", "left", "right"]}
       style={{ flex: 1, direction: "ltr", backgroundColor: theme.bg }}
     >
-      <ScrollView
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={[s.screen, style]}
+      <Content
+        {...(scroll
+          ? {
+              keyboardShouldPersistTaps: "handled",
+              style: { flex: 1 },
+              contentContainerStyle: [s.screen, style],
+            }
+          : { style: [s.screen, { flex: 1 }, style] })}
       >
         {!!title && (
           <View style={{ gap: 4, marginBottom: 4 }}>
@@ -157,7 +165,21 @@ export function Screen({
           </Pressable>
         )}
         {children}
-      </ScrollView>
+      </Content>
+      {footer && (
+        <View
+          style={{
+            backgroundColor: theme.surface,
+            borderTopWidth: 1,
+            borderTopColor: theme.line,
+            padding: 12,
+          }}
+        >
+          <View style={{ width: "100%", maxWidth: 620, alignSelf: "center" }}>
+            {footer}
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -188,18 +210,6 @@ export function Icon({ type, size = 20, box = false }) {
       }
     >
       <Feather name={meta.icon} color={color} size={size} />
-      {type === "taken" && (
-        <View
-          style={{
-            position: "absolute",
-            height: 2,
-            width: size * 0.35,
-            backgroundColor: color,
-            top: box ? 36 : size * 0.65,
-            alignSelf: "center",
-          }}
-        />
-      )}
     </View>
   );
 }

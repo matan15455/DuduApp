@@ -8,6 +8,7 @@ import {
   META,
   nextShift,
   relativeDay,
+  shortDate,
 } from "../lib/schedule";
 import { Button, Card, Row, s, Screen, Section, T } from "../components/ui";
 import DayRows from "../components/DayRows";
@@ -55,25 +56,38 @@ export default function Widgets() {
             <T size={24} style={s.numbers}>
               {next.start}
             </T>
+            {next.customHours && (
+              <T size={12} weight="bold">
+                ◷ שעות חריגות
+              </T>
+            )}
           </>
         )}
       </Card>
-      <Section>בינוני · היום ומחר</Section>
+      <Section>בינוני · היום, מחר ומחרתיים</Section>
       <Card>
         <Row>
-          {[today, addDays(today, 1)].map((day) => {
+          {[today, addDays(today, 1), addDays(today, 2)].map((day, index) => {
             const info = dayInfo(data, day);
             return (
-              <View key={day} style={[s.grow, { gap: 6 }]}>
+              <View key={day} style={[s.grow, { gap: 6, minWidth: 0 }]}>
                 <T muted size={13}>
-                  {relativeDay(day, today)}
+                  {index === 2 ? "מחרתיים" : relativeDay(day, today)}
                 </T>
-                <T size={23} weight="heavy">
+                <T size={11} muted>
+                  {shortDate(day)}
+                </T>
+                <T size={20} weight="heavy">
                   {META[info.type].label}
                 </T>
-                <T muted style={info.work ? s.numbers : undefined}>
+                <T size={12} style={info.work ? s.numbers : undefined}>
                   {info.hours}
                 </T>
+                {info.customHours && (
+                  <T size={11} weight="bold">
+                    ◷ שעות חריגות
+                  </T>
+                )}
               </View>
             );
           })}

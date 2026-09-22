@@ -71,49 +71,82 @@ const ShiftsWidget = (props, environment) => {
         >
           {next?.start || ""}
         </Text>
+        {next?.customHours && (
+          <Text
+            modifiers={[
+              font({ size: 11, weight: "bold" }),
+              foregroundStyle(ink),
+            ]}
+          >
+            ◷ שעות חריגות
+          </Text>
+        )}
       </VStack>
     );
   if (environment.widgetFamily === "systemMedium")
     return (
       <HStack
-        spacing={20}
+        spacing={10}
         modifiers={[
           containerBackground(bg, "widget"),
           widgetURL("duduapp:///"),
         ]}
       >
-        {[props.rows[1], props.rows[0]].map((row, index) => (
-          <VStack
-            key={row.day}
-            alignment="trailing"
-            spacing={7}
-            modifiers={[frame({ maxWidth: Infinity })]}
-          >
-            <Text modifiers={[font({ size: 12 }), foregroundStyle(muted)]}>
-              {index === 0 ? "מחר" : "היום"}
-            </Text>
-            <Text
-              modifiers={[
-                font({ size: 23, weight: "bold" }),
-                foregroundStyle(ink),
-              ]}
+        {[props.rows[2], props.rows[1], props.rows[0]]
+          .filter(Boolean)
+          .map((row) => (
+            <VStack
+              key={row.day}
+              alignment="trailing"
+              spacing={5}
+              modifiers={[frame({ maxWidth: Infinity })]}
             >
-              {row.label}
-            </Text>
-            <Text modifiers={[font({ size: 15 }), foregroundStyle(muted)]}>
-              {row.hours}
-            </Text>
-            <Text modifiers={[font({ size: 11 }), foregroundStyle(muted)]}>
-              {row.holiday}
-            </Text>
-          </VStack>
-        ))}
+              <Text modifiers={[font({ size: 12 }), foregroundStyle(muted)]}>
+                {row.when}
+              </Text>
+              <Text modifiers={[font({ size: 11 }), foregroundStyle(muted)]}>
+                {row.date || ""}
+              </Text>
+              <Text
+                modifiers={[
+                  font({ size: 20, weight: "bold" }),
+                  foregroundStyle(ink),
+                ]}
+              >
+                {row.label}
+              </Text>
+              <Text
+                modifiers={[
+                  font({
+                    size: 12,
+                    weight: row.customHours ? "bold" : "regular",
+                  }),
+                  foregroundStyle(ink),
+                ]}
+              >
+                {row.hours}
+              </Text>
+              {row.customHours && (
+                <Text
+                  modifiers={[
+                    font({ size: 10, weight: "bold" }),
+                    foregroundStyle(ink),
+                  ]}
+                >
+                  ◷ שעות חריגות
+                </Text>
+              )}
+              <Text modifiers={[font({ size: 11 }), foregroundStyle(muted)]}>
+                {row.holiday}
+              </Text>
+            </VStack>
+          ))}
       </HStack>
     );
   return (
     <VStack
       alignment="trailing"
-      spacing={12}
+      spacing={8}
       modifiers={[
         containerBackground(bg, "widget"),
         widgetURL("duduapp:///"),
@@ -131,9 +164,29 @@ const ShiftsWidget = (props, environment) => {
       </Text>
       {props.rows.map((row) => (
         <HStack key={row.day} spacing={8}>
-          <Text modifiers={[font({ size: 12 }), foregroundStyle(muted)]}>
-            {row.hours}
-          </Text>
+          <VStack alignment="trailing" spacing={2}>
+            <Text
+              modifiers={[
+                font({
+                  size: 12,
+                  weight: row.customHours ? "bold" : "regular",
+                }),
+                foregroundStyle(ink),
+              ]}
+            >
+              {row.hours}
+            </Text>
+            {row.customHours && (
+              <Text
+                modifiers={[
+                  font({ size: 10, weight: "bold" }),
+                  foregroundStyle(ink),
+                ]}
+              >
+                ◷ שעות חריגות
+              </Text>
+            )}
+          </VStack>
           <Spacer />
           <VStack alignment="trailing" spacing={2}>
             <Text
@@ -150,15 +203,20 @@ const ShiftsWidget = (props, environment) => {
               </Text>
             )}
           </VStack>
-          <Text
-            modifiers={[
-              font({ size: 13 }),
-              foregroundStyle(muted),
-              frame({ width: 55, alignment: "trailing" }),
-            ]}
-          >
-            {row.when}
-          </Text>
+          <VStack alignment="trailing" spacing={2}>
+            <Text
+              modifiers={[
+                font({ size: 13 }),
+                foregroundStyle(muted),
+                frame({ width: 55, alignment: "trailing" }),
+              ]}
+            >
+              {row.when}
+            </Text>
+            <Text modifiers={[font({ size: 11 }), foregroundStyle(muted)]}>
+              {row.date || ""}
+            </Text>
+          </VStack>
         </HStack>
       ))}
     </VStack>

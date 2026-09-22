@@ -16,7 +16,7 @@ import {
 export default function ShareScreen() {
   const { data, today, notify } = useApp(),
     [range, setRange] = useState("7"),
-    [detail, setDetail] = useState(true),
+    [detail, setDetail] = useState(false),
     [from, setFrom] = useState(today),
     [to, setTo] = useState(addDays(today, 6));
   const date = parse(today);
@@ -39,6 +39,38 @@ export default function ShareScreen() {
   const text = shareText(data, first, last, detail);
   return (
     <Screen
+      footer={
+        <Row>
+          <Button
+            title="שתף"
+            icon="share"
+            primary
+            disabled={!text}
+            style={s.grow}
+            onPress={async () => {
+              try {
+                await Share.share({ message: text });
+              } catch {
+                Alert.alert("השיתוף לא הושלם", "נסה שוב.");
+              }
+            }}
+          />
+          <Button
+            title="העתק ללוח"
+            icon="copy"
+            disabled={!text}
+            style={s.grow}
+            onPress={async () => {
+              try {
+                await Clipboard.setStringAsync(text);
+                notify("המשמרות הועתקו ללוח");
+              } catch {
+                Alert.alert("ההעתקה נכשלה", "נסה שוב.");
+              }
+            }}
+          />
+        </Row>
+      }
       title="שיתוף המשמרות"
       subtitle="הטקסט נשלח לכל אפליקציה. אין צורך שמישהו יתקין משהו."
     >
@@ -88,36 +120,6 @@ export default function ShareScreen() {
       <T size={13} muted>
         הערות אישיות והמשמרת המקורית אינן נכללות בשיתוף.
       </T>
-      <Row>
-        <Button
-          title="שתף"
-          icon="share"
-          primary
-          disabled={!text}
-          style={s.grow}
-          onPress={async () => {
-            try {
-              await Share.share({ message: text });
-            } catch {
-              Alert.alert("השיתוף לא הושלם", "נסה שוב.");
-            }
-          }}
-        />
-        <Button
-          title="העתק ללוח"
-          icon="copy"
-          disabled={!text}
-          style={s.grow}
-          onPress={async () => {
-            try {
-              await Clipboard.setStringAsync(text);
-              notify("המשמרות הועתקו ללוח");
-            } catch {
-              Alert.alert("ההעתקה נכשלה", "נסה שוב.");
-            }
-          }}
-        />
-      </Row>
     </Screen>
   );
 }

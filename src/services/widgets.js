@@ -28,6 +28,7 @@ export function widgetProps(data, now) {
           label: META[next.type].label,
           when: `${relativeDay(next.day, today)} · ${shortDate(next.day)}`,
           start: next.start,
+          customHours: next.customHours,
         }
       : null,
     rows: Array.from({ length: 7 }, (_, index) => {
@@ -35,8 +36,10 @@ export function widgetProps(data, now) {
         info = dayInfo(data, day);
       return {
         day,
+        date: shortDate(day),
+        customHours: info.customHours,
         label: META[info.type].label,
-        when: relativeDay(day, today),
+        when: index === 2 ? "מחרתיים" : relativeDay(day, today),
         hours: info.work ? info.hours : "—",
         holiday: data.showHeb ? holiday(day) : "",
       };

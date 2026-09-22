@@ -1,119 +1,129 @@
-import React from "react";
-import { View } from "react-native";
-import { router } from "expo-router";
+import React, { useLayoutEffect, useRef, useState } from "react";
+import { ScrollView, View } from "react-native";
 import { useApp } from "../../state/AppProvider";
-import {
-  addDays,
-  cycleIndex,
-  dayInfo,
-  longDate,
-  META,
-  nextShift,
-  relativeDay,
-  resetOverride,
-  TYPES,
-} from "../../lib/schedule";
+import { addDays, addMonth, parse, shortDate } from "../../lib/schedule";
 import { hebrewDate } from "../../lib/hebrew";
-import { Button, Card, Row, s, Screen, Section, T } from "../../components/ui";
-import ShiftCard from "../../components/ShiftCard";
-import DayRows from "../../components/DayRows";
-export default function Today() {
-  const { data, today, now, theme, editDay, notify } = useApp(),
-    info = dayInfo(data, today),
-    next = nextShift(data, now),
-    index = cycleIndex(today, data.cycleStart);
+import { Button, Row, s, Screen, T } from "../../components/ui";
+import CalendarPage from "../../components/CalendarPage";
+
+export default function Calendar() {
+  const { data, today } = useApp();
+  const [anchor, setAnchor] = useState(today),
+    [mode, setMode] = useState("month");
+  const [size, setSize] = useState({ width: 0, height: 0 });
+  const pager = useRef(null),
+    settledPage = useRef("");
+  const period = (delta) =>
+    mode === "month" ? addMonth(anchor, delta) : addDays(anchor, delta * 7);
+  const month = anchor.slice(0, 7) + "-01",
+    weekStart = addDays(anchor, -parse(anchor).getDay());
+  const pageKey = `${mode}-${anchor}-${size.width}`;
+  useLayoutEffect(() => {
+    settledPage.current = "";
+  }, [pageKey]);
+  const move = (delta) =>
+    pager.current?.scrollTo({ x: size.width * (1 - delta), animated: true });
   return (
-    <Screen>
-      <View style={{ gap: 3 }}>
-        <Section>היום</Section>
-        <T size={24} weight="bold">
-          {longDate(today)}
-        </T>
-        {data.showHeb && (
-          <T muted size={14}>
-            {hebrewDate(today)}
+    <Screen
+      scroll={false}
+      style={{ paddingHorizontal: 12, paddingTop: 8, paddingBottom: 8, gap: 8 }}
+    >
+      <Row>
+        <Button
+          title="חודש"
+          selected={mode === "month"}
+          style={s.grow}
+          onPress={() => setMode("month")}
+        />
+        <Button
+          title="שבוע"
+          selected={mode === "week"}
+          style={s.grow}
+          onPress={() => setMode("week")}
+        />
+      </Row>
+      <Row style={{ gap: 5 }}>
+        <Button
+          title="›"
+          style={{ width: 44, paddingHorizontal: 0 }}
+          onPress={() => move(-1)}
+        />
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <T
+            size={20}
+            weight="heavy"
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            style={s.center}
+          >
+            {mode === "month"
+              ? new Intl.DateTimeFormat("he-IL", {
+                  month: "long",
+                  year: "numeric",
+                }).format(parse(month))
+              : `${shortDate(weekStart)}–${shortDate(addDays(weekStart, 6))}`}
           </T>
-        )}
-      </View>
-      <ShiftCard info={info} hero>
-        <Row style={{ marginTop: 4 }}>
-          <Button
-            title="ערוך את היום"
-            primary
-            style={s.grow}
-            onPress={() =>
-              router.push({ pathname: "/day", params: { date: today } })
-            }
-          />
-          <Button
-            title={info.type === "taken" ? "בטל חופש" : "קח חופש היום"}
-            disabled={!info.work && info.type !== "taken"}
-            style={s.grow}
-            onPress={() => {
-              editDay(today, (o) =>
-                info.type === "taken"
-                  ? resetOverride(o)
-                  : { note: o.note, type: "taken" },
-              );
-              notify(
-                info.type === "taken"
-                  ? "היום הוחזר לפי הסבב"
-                  : "היום סומן כחופש שנלקח",
-              );
-            }}
-          />
-        </Row>
-      </ShiftCard>
-      <Card>
-        <Row>
-          <View style={s.grow}>
-            <Section>המשמרת הבאה</Section>
-            <T size={20} weight="bold">
-              {next
-                ? `${relativeDay(next.day, today)} · ${META[next.type].label}`
-                : "אין משמרת קרובה"}
-            </T>
-          </View>
-          {next && (
-            <T size={16} muted style={s.numbers}>
-              {next.hours}
+          {data.showHeb && (
+            <T size={11} muted numberOfLines={1} style={s.center}>
+              {hebrewDate(mode === "month" ? month : weekStart)}
             </T>
           )}
-        </Row>
-      </Card>
-      <Card>
-        <Row style={{ justifyContent: "space-between" }}>
-          <Section>מקום בסבב</Section>
-          <T weight="bold" size={14}>
-            {META[info.base].short} · {(index % 4) + 1} מתוך 4
-          </T>
-        </Row>
-        <Row style={{ gap: 4 }}>
-          {Array.from({ length: 16 }, (_, i) => {
-            const m = META[TYPES[Math.floor(i / 4)]];
-            return (
-              <View
-                key={i}
-                style={{
-                  flex: 1,
-                  height: 9,
-                  borderRadius: 5,
-                  backgroundColor: theme.dark ? m.dark : m.color,
-                  opacity: i === index ? 1 : 0.28,
-                  borderWidth: i === index ? 2 : 0,
-                  borderColor: theme.ink,
-                }}
-              />
-            );
-          })}
-        </Row>
-      </Card>
-      <Card style={{ paddingBottom: 0 }}>
-        <Section>הימים הקרובים</Section>
-        <DayRows
-          days={Array.from({ length: 7 }, (_, i) => addDays(today, i))}
+        </View>
+        <Button
+          title="‹"
+          style={{ width: 44, paddingHorizontal: 0 }}
+          onPress={() => move(1)}
         />
-      </Card>
+        <Button
+          title="היום"
+          style={{ paddingHorizontal: 10 }}
+          onPress={() => setAnchor(today)}
+        />
+      </Row>
+      <View
+        style={{ flex: 1, overflow: "hidden", direction: "ltr" }}
+        onLayout={({ nativeEvent: { layout } }) =>
+          setSize({ width: layout.width, height: layout.height })
+        }
+      >
+        {size.width > 0 && (
+          <ScrollView
+            key={pageKey}
+            ref={pager}
+            horizontal
+            pagingEnabled
+            directionalLockEnabled
+            bounces={false}
+            showsHorizontalScrollIndicator={false}
+            contentOffset={{ x: size.width, y: 0 }}
+            style={{ flex: 1, direction: "ltr" }}
+            contentContainerStyle={{ flexDirection: "row", direction: "ltr" }}
+            onMomentumScrollEnd={({ nativeEvent }) => {
+              const page = Math.round(nativeEvent.contentOffset.x / size.width);
+              if (page === 1 || settledPage.current === pageKey) return;
+              settledPage.current = pageKey;
+              setAnchor(period(1 - page));
+            }}
+          >
+            {[1, 0, -1].map((delta) => (
+              <View
+                key={delta}
+                accessibilityElementsHidden={delta !== 0}
+                importantForAccessibility={
+                  delta === 0 ? "auto" : "no-hide-descendants"
+                }
+                style={{ width: size.width, height: size.height }}
+              >
+                <CalendarPage
+                  anchor={period(delta)}
+                  mode={mode}
+                  height={size.height}
+                />
+              </View>
+            ))}
+          </ScrollView>
+        )}
+      </View>
     </Screen>
   );
 }

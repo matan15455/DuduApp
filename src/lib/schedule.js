@@ -7,7 +7,6 @@ export const TYPES = /** @type {ShiftType[]} */ ([
   "afternoon",
   "night",
   "off",
-  "taken",
 ]);
 export const META = {
   morning: {
@@ -38,22 +37,13 @@ export const META = {
     darkBg: "#1E2237",
   },
   off: {
-    label: "חופש בסבב",
+    label: "חופש",
     short: "חופש",
     icon: "home",
     color: "#3E7D5E",
     bg: "#E2F0E7",
     dark: "#74C29A",
     darkBg: "#182720",
-  },
-  taken: {
-    label: "חופש שנלקח",
-    short: "נלקח",
-    icon: "home",
-    color: "#7A5AA6",
-    bg: "#EEE7F7",
-    dark: "#B79BE0",
-    darkBg: "#241D31",
   },
 };
 export const DOW = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
@@ -122,7 +112,8 @@ export function dayInfo(data, day) {
   const index = cycleIndex(day, data.cycleStart),
     base = TYPES[Math.floor(index / 4)];
   const override = data.overrides[day] || {},
-    type = override.type || base;
+    // Keep previously saved leave days compatible with the unified off type.
+    type = override.type === "taken" ? "off" : override.type || base;
   const work = ["morning", "afternoon", "night"].includes(type),
     defaults = data.hours[type];
   const start = work ? override.start || defaults[0] : "",
@@ -165,7 +156,7 @@ export function rangeDays(from, to) {
   if (!Number.isFinite(count) || count < 0 || count > 365) return [];
   return Array.from({ length: count + 1 }, (_, i) => addDays(from, i));
 }
-export function shareText(data, from, to, detailed = true) {
+export function shareText(data, from, to, detailed = false) {
   const days = rangeDays(from, to);
   if (!days.length) return "";
   return (
@@ -173,7 +164,7 @@ export function shareText(data, from, to, detailed = true) {
     days
       .map((day) => {
         const i = dayInfo(data, day);
-        return `${shortDate(day)} — ${META[i.type].label}${detailed && i.work ? ` ${i.hours}${i.overnight ? ` (סיום ב־${shortDate(addDays(day, 1))})` : ""}` : ""}`;
+        return `${DOW[parse(day).getDay()]} ${shortDate(day)} — ${META[i.type].label}${detailed && i.work ? ` ${i.hours}${i.overnight ? ` (סיום ב־${shortDate(addDays(day, 1))})` : ""}` : ""}`;
       })
       .join("\n")
   );

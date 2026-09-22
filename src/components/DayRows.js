@@ -40,7 +40,7 @@ export default function DayRows({ days }) {
               <View style={s.grow}>
                 <T size={15} weight="medium">
                   {META[info.type].short}
-                  {info.changed ? " •" : ""}
+                  {info.typeChanged ? " ✎" : ""}
                 </T>
                 {!!name && (
                   <T muted size={11} numberOfLines={1}>
@@ -51,9 +51,20 @@ export default function DayRows({ days }) {
               {!!info.note && (
                 <Feather name="file-text" size={13} color={theme.muted} />
               )}
-              <T size={12} muted style={info.work ? s.numbers : undefined}>
-                {info.work ? info.hours : "—"}
-              </T>
+              <View>
+                <T
+                  size={12}
+                  muted={!info.customHours}
+                  style={info.work ? s.numbers : undefined}
+                >
+                  {info.work ? info.hours : "—"}
+                </T>
+                {info.customHours && (
+                  <T size={11} weight="bold">
+                    ◷ שעות חריגות
+                  </T>
+                )}
+              </View>
             </Row>
           </Pressable>
         );
