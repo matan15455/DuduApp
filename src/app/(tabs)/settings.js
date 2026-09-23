@@ -45,6 +45,11 @@ export default function Settings() {
   }
   return (
     <Screen title="הגדרות" subtitle="הסבב שלך, בדרך שלך.">
+      <Button
+        title="ייבוא סדר עבודה מתמונה או Excel"
+        icon="upload"
+        onPress={() => router.push("/import")}
+      />
       <Section>הסבב שלי</Section>
       <Card>
         {TYPES.slice(0, 4).map((type) => (
@@ -227,7 +232,7 @@ export default function Settings() {
         }
       />
       <T muted size={12} style={s.center}>
-        משמרות · גרסה 1.0 · נשמר רק במכשיר שלך
+        משמרות · גרסה 1.0 · הלוח נשמר במכשיר שלך
       </T>
     </Screen>
   );

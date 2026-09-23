@@ -4,9 +4,7 @@
     "slug": "DuduApp",
     "scheme": "duduapp",
     "version": "1.0.0",
-    "platforms": [
-      "ios"
-    ],
+    "platforms": ["ios"],
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -18,9 +16,7 @@
         "ITSAppUsesNonExemptEncryption": false,
         "ExpoLocalization_supportsRTL": true,
         "ExpoLocalization_forcesRTL": true,
-        "CFBundleLocalizations": [
-          "he"
-        ]
+        "CFBundleLocalizations": ["he"]
       }
     },
     "plugins": [
@@ -60,15 +56,21 @@
         "expo-localization",
         {
           "supportedLocales": {
-            "ios": [
-              "he"
-            ]
+            "ios": ["he"]
           },
           "supportsRTL": true,
           "forcesRTL": true
         }
       ],
-      "expo-background-task"
+      "expo-background-task",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "בחירת תמונה של סדר העבודה לזיהוי המשמרות של דודו.",
+          "cameraPermission": "צילום סדר העבודה לזיהוי המשמרות של דודו.",
+          "microphonePermission": false
+        }
+      ]
     ],
     "extra": {
       "router": {},

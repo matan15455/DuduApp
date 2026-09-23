@@ -44,8 +44,17 @@ function Markers({ info }) {
     </Row>
   );
 }
-export default function CalendarPage({ anchor, mode, height }) {
+export default function CalendarPage({ anchor, mode, height, width }) {
   const { data, today, theme } = useApp();
+  // Use the same measured width for headers, empty slots and populated cells.
+  // Padding and intrinsic text sizes must never affect the column allocation.
+  const columnStyle = {
+    width: Math.max(0, (width - 2 - 6 * 4) / 7),
+    flexGrow: 0,
+    flexShrink: 0,
+    minWidth: 0,
+    overflow: "hidden",
+  };
   const month = anchor.slice(0, 7) + "-01",
     first = parse(month);
   const count = new Date(
@@ -73,8 +82,13 @@ export default function CalendarPage({ anchor, mode, height }) {
       directionalLockEnabled
       bounces={false}
       showsVerticalScrollIndicator={false}
-      style={{ flex: 1 }}
-      contentContainerStyle={{ gap: 4, paddingHorizontal: 1, paddingBottom: 2 }}
+      style={{ flex: 1, width }}
+      contentContainerStyle={{
+        width,
+        gap: 4,
+        paddingHorizontal: 1,
+        paddingBottom: 2,
+      }}
     >
       {mode === "month" ? (
         <>
@@ -85,7 +99,7 @@ export default function CalendarPage({ anchor, mode, height }) {
                 size={13}
                 muted
                 weight="bold"
-                style={{ flex: 1, minWidth: 0, textAlign: "center" }}
+                style={[columnStyle, { textAlign: "center" }]}
               >
                 {day}
               </T>
@@ -94,13 +108,7 @@ export default function CalendarPage({ anchor, mode, height }) {
           {Array.from({ length: weeks }, (_, week) => (
             <Row key={week} style={{ gap: 4, alignItems: "stretch" }}>
               {cells.slice(week * 7, week * 7 + 7).map((day, col) => {
-                if (!day)
-                  return (
-                    <View
-                      key={col}
-                      style={{ flex: 1, flexBasis: 0, minWidth: 0 }}
-                    />
-                  );
+                if (!day) return <View key={col} style={columnStyle} />;
                 const info = dayInfo(data, day),
                   meta = META[info.type],
                   color = theme.dark ? meta.dark : meta.color,
@@ -112,10 +120,7 @@ export default function CalendarPage({ anchor, mode, height }) {
                     accessibilityLabel={`${shortDate(day)}, ${meta.label}${info.customHours ? `, שעות חריגות ${info.hours}` : ""}${info.typeChanged ? ", משמרת ששונתה" : ""}${info.note ? ", יש הערה" : ""}${name ? `, ${name}` : ""}`}
                     onPress={() => open(day)}
                     style={{
-                      flex: 1,
-                      flexBasis: 0,
-                      minWidth: 0,
-                      overflow: "hidden",
+                      ...columnStyle,
                       minHeight: cellHeight,
                       padding: 2,
                       borderRadius: 12,

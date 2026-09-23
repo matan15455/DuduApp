@@ -1,5 +1,6 @@
 import React, { useLayoutEffect, useRef, useState } from "react";
 import { ScrollView, View } from "react-native";
+import { router } from "expo-router";
 import { useApp } from "../../state/AppProvider";
 import { addDays, addMonth, parse, shortDate } from "../../lib/schedule";
 import { hebrewDate } from "../../lib/hebrew";
@@ -29,6 +30,11 @@ export default function Calendar() {
       style={{ paddingHorizontal: 12, paddingTop: 8, paddingBottom: 8, gap: 8 }}
     >
       <Row>
+        <Button
+          title="ייבוא"
+          icon="upload"
+          onPress={() => router.push("/import")}
+        />
         <Button
           title="חודש"
           selected={mode === "month"}
@@ -118,6 +124,7 @@ export default function Calendar() {
                   anchor={period(delta)}
                   mode={mode}
                   height={size.height}
+                  width={size.width}
                 />
               </View>
             ))}
