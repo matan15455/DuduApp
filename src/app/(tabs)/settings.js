@@ -44,7 +44,7 @@ export default function Settings() {
     }
   }
   return (
-    <Screen title="הגדרות" subtitle="הסבב שלך, בדרך שלך.">
+    <Screen title="הגדרות">
       <Section>הסבב שלי</Section>
       <Card>
         {TYPES.slice(0, 4).map((type) => (
@@ -63,10 +63,6 @@ export default function Settings() {
           value={data.cycleStart}
           onChange={(cycleStart) => update({ cycleStart })}
         />
-        <T size={13} muted>
-          בתאריך זה מתחיל יום הבוקר הראשון. הסבב קבוע: 4 בוקר, 4 צהריים, 4 לילה
-          ו־4 חופש.
-        </T>
       </Card>
       <Section>שעות ברירת מחדל</Section>
       {TYPES.slice(0, 3).map((type) => (
@@ -154,13 +150,6 @@ export default function Settings() {
                 onChange={(at) => reminder({ at })}
               />
             )}
-            <T muted size={13}>
-              התזכורת מותאמת לשעות בפועל. ביום שהפך לחופש לא תישלח תזכורת.
-            </T>
-            <T muted size={12}>
-              התזכורות מתמלאות מחדש בפתיחת האפליקציה וברענון ברקע. מומלץ לפתוח
-              את האפליקציה לפחות פעם בחודש.
-            </T>
           </>
         )}
       </Card>
@@ -226,9 +215,6 @@ export default function Settings() {
           )
         }
       />
-      <T muted size={12} style={s.center}>
-        משמרות · גרסה 1.0 · נשמר רק במכשיר שלך
-      </T>
     </Screen>
   );
 }

@@ -72,7 +72,6 @@ export default function ShareScreen() {
         </Row>
       }
       title="שיתוף המשמרות"
-      subtitle="הטקסט נשלח לכל אפליקציה. אין צורך שמישהו יתקין משהו."
     >
       <Section>טווח</Section>
       <View style={s.wrap}>
@@ -117,9 +116,6 @@ export default function ShareScreen() {
           {text || "בחר תאריך סיום שאינו לפני תאריך ההתחלה, בטווח של עד שנה."}
         </T>
       </Card>
-      <T size={13} muted>
-        הערות אישיות והמשמרת המקורית אינן נכללות בשיתוף.
-      </T>
     </Screen>
   );
 }

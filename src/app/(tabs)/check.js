@@ -11,10 +11,7 @@ export default function Check() {
     [day, setDay] = useState(addDays(today, 1)),
     info = dayInfo(data, day);
   return (
-    <Screen
-      title="האם אני פנוי"
-      subtitle="בחר תאריך ותראה מיד אם אתה פנוי או עובד."
-    >
+    <Screen title="האם אני פנוי">
       <Card>
         <PickerField label="תאריך" value={day} onChange={setDay} />
       </Card>

@@ -30,16 +30,10 @@ export default function Onboarding() {
         <T size={38} weight="heavy">
           המשמרות שלך.{"\n"}פשוט, במקום אחד.
         </T>
-        <T muted size={18}>
-          מה עובדים היום, מתי המשמרת הבאה ומתי יש זמן לעצמך.
-        </T>
       </View>
       <Card>
         <T size={21} weight="bold">
           מתחילים בסבב שלך
-        </T>
-        <T muted>
-          בחר את התאריך של יום הבוקר הראשון בסבב. אפשר לבחור גם תאריך בעבר.
         </T>
         <PickerField
           label="תחילת הסבב · בוקר 1 מתוך 4"
@@ -60,9 +54,6 @@ export default function Onboarding() {
           ))}
         </Row>
       </Card>
-      <T muted size={14}>
-        16 ימים שחוזרים על עצמם. כל שאר התאריכים יחושבו אוטומטית, קדימה ואחורה.
-      </T>
       <Button
         title="הצג את המשמרות שלי"
         primary
@@ -71,9 +62,6 @@ export default function Onboarding() {
           router.replace("/");
         }}
       />
-      <T size={13} muted style={{ textAlign: "center" }}>
-        המידע שלך נשמר במכשיר, ללא צורך בחשבון.
-      </T>
     </Screen>
   );
 }

@@ -17,10 +17,7 @@ export default function Widgets() {
   const { data, today, now } = useApp(),
     next = nextShift(data, now);
   return (
-    <Screen
-      title="ווידג׳טים"
-      subtitle="המשמרות שלך על מסך הבית, גם בלי לפתוח את האפליקציה."
-    >
+    <Screen title="ווידג׳טים">
       <Button title="› חזרה להגדרות" onPress={() => router.back()} />
       <Card>
         {!widgetsAvailable() ? (

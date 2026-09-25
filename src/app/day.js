@@ -106,7 +106,6 @@ export default function Day() {
         )}
         {mode === "shift" && (
           <>
-            <T muted>השינוי חל רק על היום הזה. הסבב ממשיך כרגיל.</T>
             {TYPES.map((type) => (
               <Card key={type} style={{ padding: 0 }}>
                 <Button
@@ -127,10 +126,6 @@ export default function Day() {
         )}
         {mode === "hours" && (
           <>
-            <T muted>
-              שעות חריגות ל־{longDate(day)} בלבד. שעות {META[info.type].label}{" "}
-              הרגילות לא ישתנו.
-            </T>
             <Card>
               <PickerField
                 mode="time"
@@ -162,7 +157,6 @@ export default function Day() {
         )}
         {mode === "note" && (
           <>
-            <T muted>ההערה לא משנה את המשמרת ולא נכנסת לשיתוף.</T>
             <TextInput
               accessibilityLabel="הערה אישית ליום"
               multiline
