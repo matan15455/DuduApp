@@ -179,8 +179,9 @@ export function reminderPlan(data, now = new Date()) {
       result.push({
         day: info.day,
         date,
-        title: `משמרת ${META[info.type].label}`,
-        body: `${longDate(info.day)} · ${info.hours}${info.overnight ? ` · סיום ב־${shortDate(addDays(info.day, 1))}` : ""}`,
+        // Relative to delivery day, since reminders are scheduled in advance.
+        title: `${relativeDay(info.day, iso(date))} — משמרת ${META[info.type].label}`,
+        body: `תחילה ב־${info.start} · סיום ${info.overnight ? "למחרת " : ""}ב־${info.end}\n${DOW[parse(info.day).getDay()]} · ${longDate(info.day)}`,
       });
   }
   return result;
