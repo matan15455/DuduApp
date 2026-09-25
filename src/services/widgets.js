@@ -26,6 +26,9 @@ export function widgetProps(data, now) {
     next: next
       ? {
           label: META[next.type].label,
+          fill: META[next.type].vividBg,
+          ink: META[next.type].vividInk,
+          symbol: META[next.type].symbol,
           when: `${relativeDay(next.day, today)} · ${shortDate(next.day)}`,
           start: next.start,
           customHours: next.customHours,
@@ -39,6 +42,9 @@ export function widgetProps(data, now) {
         date: shortDate(day),
         customHours: info.customHours,
         label: META[info.type].label,
+        fill: META[info.type].vividBg,
+        ink: META[info.type].vividInk,
+        symbol: META[info.type].symbol,
         when: index === 2 ? "מחרתיים" : relativeDay(day, today),
         hours: info.work ? info.hours : "—",
         holiday: data.showHeb ? holiday(day) : "",

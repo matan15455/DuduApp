@@ -40,14 +40,31 @@ export default function Onboarding() {
           value={start}
           onChange={setStart}
         />
-        <Row style={{ justifyContent: "space-between", marginTop: 8 }}>
+        <Row style={{ justifyContent: "space-between", marginTop: 8, gap: 6 }}>
           {TYPES.slice(0, 4).map((type) => (
-            <View key={type} style={{ alignItems: "center", gap: 6 }}>
+            <View
+              key={type}
+              style={{
+                flex: 1,
+                minWidth: 0,
+                alignItems: "center",
+                gap: 6,
+                paddingVertical: 10,
+                borderRadius: 12,
+                backgroundColor: META[type].vividBg,
+              }}
+            >
               <Icon type={type} />
-              <T size={14} weight="bold">
+              <T
+                size={14}
+                weight="bold"
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                style={{ color: META[type].vividInk }}
+              >
                 {META[type].short}
               </T>
-              <T size={12} muted>
+              <T size={12} style={{ color: META[type].vividInk }}>
                 4 ימים
               </T>
             </View>

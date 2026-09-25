@@ -7,11 +7,12 @@ import { dayInfo, META, relativeDay, shortDate } from "../lib/schedule";
 import { holiday } from "../lib/hebrew";
 import { Icon, Row, s, T } from "./ui";
 export default function DayRows({ days }) {
-  const { data, today, theme } = useApp();
+  const { data, today } = useApp();
   return (
-    <View>
+    <View style={{ gap: 6 }}>
       {days.map((day) => {
         const info = dayInfo(data, day),
+          meta = META[info.type],
           name = data.showHeb ? holiday(day) : "";
         return (
           <Pressable
@@ -23,44 +24,52 @@ export default function DayRows({ days }) {
             }
             style={{
               paddingVertical: 13,
-              borderTopWidth: 1,
-              borderColor: theme.line,
+              paddingHorizontal: 8,
+              borderRadius: 12,
+              backgroundColor: meta.vividBg,
             }}
           >
             <Row>
               <Icon type={info.type} size={18} />
               <View style={{ width: 65 }}>
-                <T weight="bold" size={15}>
+                <T weight="bold" size={15} style={{ color: meta.vividInk }}>
                   {relativeDay(day, today)}
                 </T>
-                <T muted size={12}>
+                <T size={12} style={{ color: meta.vividInk }}>
                   {shortDate(day)}
                 </T>
               </View>
-              <View style={s.grow}>
-                <T size={15} weight="medium">
+              <View style={[s.grow, { minWidth: 0 }]}>
+                <T size={15} weight="medium" style={{ color: meta.vividInk }}>
                   {META[info.type].short}
                   {info.typeChanged ? " ✎" : ""}
                 </T>
                 {!!name && (
-                  <T muted size={11} numberOfLines={1}>
+                  <T
+                    size={11}
+                    numberOfLines={1}
+                    style={{ color: meta.vividInk }}
+                  >
                     {name}
                   </T>
                 )}
               </View>
               {!!info.note && (
-                <Feather name="file-text" size={13} color={theme.muted} />
+                <Feather name="file-text" size={13} color={meta.vividInk} />
               )}
               <View>
                 <T
                   size={12}
                   muted={!info.customHours}
-                  style={info.work ? s.numbers : undefined}
+                  style={[
+                    info.work ? s.numbers : undefined,
+                    { color: meta.vividInk },
+                  ]}
                 >
                   {info.work ? info.hours : "—"}
                 </T>
                 {info.customHours && (
-                  <T size={11} weight="bold">
+                  <T size={11} weight="bold" style={{ color: meta.vividInk }}>
                     ◷ שעות חריגות
                   </T>
                 )}

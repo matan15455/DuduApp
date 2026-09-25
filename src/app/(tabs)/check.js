@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View } from "react-native";
 import { router } from "expo-router";
 import { useApp } from "../../state/AppProvider";
-import { addDays, addMonth, dayInfo, longDate } from "../../lib/schedule";
+import { addDays, addMonth, dayInfo, longDate, META } from "../../lib/schedule";
 import { hebrewDate } from "../../lib/hebrew";
 import { Button, Card, PickerField, s, Screen, T } from "../../components/ui";
 import ShiftCard from "../../components/ShiftCard";
@@ -33,7 +33,7 @@ export default function Check() {
         {info.work ? "יש לך משמרת" : "אתה פנוי"}
       </T>
       <ShiftCard info={info} tint>
-        <T size={15} muted>
+        <T size={15} style={{ color: META[info.type].vividInk }}>
           {longDate(day)}
           {data.showHeb ? ` · ${hebrewDate(day)}` : ""}
         </T>

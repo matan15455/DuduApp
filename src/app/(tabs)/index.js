@@ -118,6 +118,7 @@ export default function Calendar() {
                   anchor={period(delta)}
                   mode={mode}
                   height={size.height}
+                  width={size.width}
                 />
               </View>
             ))}

@@ -8,7 +8,7 @@ export default function ShiftCard({
   info,
   children = undefined,
   hero = false,
-  tint = false,
+  tint = true,
 }) {
   const { theme, data } = useApp(),
     meta = META[info.type],
@@ -24,17 +24,28 @@ export default function ShiftCard({
         borderRadius: hero ? 28 : 22,
         padding: hero ? 22 : 18,
         ...(tint
-          ? { backgroundColor: theme.dark ? meta.darkBg : meta.bg }
+          ? { backgroundColor: meta.vividBg, borderColor: meta.vividBg }
           : {}),
       }}
     >
       <Row>
         <Icon type={info.type} size={28} box />
         <View style={s.grow}>
-          <T size={hero ? 36 : 29} weight="heavy">
+          <T
+            size={hero ? 36 : 29}
+            weight="heavy"
+            style={tint ? { color: meta.vividInk } : undefined}
+          >
             {meta.label}
           </T>
-          <T size={20} muted style={info.work ? s.numbers : undefined}>
+          <T
+            size={20}
+            muted
+            style={[
+              info.work ? s.numbers : undefined,
+              tint ? { color: meta.vividInk } : undefined,
+            ]}
+          >
             {info.hours}
           </T>
         </View>
@@ -59,7 +70,7 @@ export default function ShiftCard({
         </View>
       )}
       {info.typeChanged && (
-        <T size={14} muted>
+        <T size={14} muted style={tint ? { color: meta.vividInk } : undefined}>
           לפי הסבב: {META[info.base].label}
           {data.hours[info.base] ? ` · ${data.hours[info.base].join("–")}` : ""}
         </T>
@@ -68,7 +79,12 @@ export default function ShiftCard({
         <T
           size={14}
           muted
-          style={[s.numbers, s.line, { borderColor: theme.line }]}
+          style={[
+            s.numbers,
+            s.line,
+            { borderColor: tint ? meta.vividInk : theme.line },
+            tint ? { color: meta.vividInk } : undefined,
+          ]}
         >{`${shortDate(info.day)} ${info.start} → ${shortDate(addDays(info.day, 1))} ${info.end}`}</T>
       )}
       {!!info.note && (

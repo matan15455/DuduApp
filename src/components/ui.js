@@ -72,8 +72,10 @@ export function Button({
   disabled = false,
   style = undefined,
   icon = undefined,
+  shiftType = undefined,
 }) {
   const { theme } = useApp();
+  const shift = shiftType ? META[shiftType] : null;
   return (
     <Pressable
       accessibilityRole="button"
@@ -83,12 +85,20 @@ export function Button({
       style={({ pressed }) => [
         s.button,
         {
-          backgroundColor: primary
-            ? theme.accent
-            : selected
-              ? theme.accentSoft
-              : theme.surface,
-          borderColor: primary || selected ? theme.accent : theme.border,
+          backgroundColor: shift
+            ? shift.vividBg
+            : primary
+              ? theme.accent
+              : selected
+                ? theme.accentSoft
+                : theme.surface,
+          borderColor: shift
+            ? selected
+              ? shift.vividInk
+              : shift.vividBg
+            : primary || selected
+              ? theme.accent
+              : theme.border,
           opacity: disabled ? 0.4 : pressed ? 0.65 : 1,
         },
         style,
@@ -99,7 +109,7 @@ export function Button({
           <Feather
             name={icon}
             size={18}
-            color={primary ? theme.bg : theme.accent}
+            color={shift ? shift.vividInk : primary ? theme.bg : theme.accent}
           />
         )}
         <T
@@ -107,17 +117,22 @@ export function Button({
           style={{
             flexShrink: 1,
             textAlign: "center",
-            color: primary
-              ? theme.dark
-                ? "#13221F"
-                : "#FFFFFF"
-              : selected
-                ? theme.accent
-                : theme.ink,
+            color: shift
+              ? shift.vividInk
+              : primary
+                ? theme.dark
+                  ? "#13221F"
+                  : "#FFFFFF"
+                : selected
+                  ? theme.accent
+                  : theme.ink,
           }}
         >
           {title}
         </T>
+        {shift && selected && (
+          <Feather name="check-circle" size={20} color={shift.vividInk} />
+        )}
       </Row>
     </Pressable>
   );
@@ -191,25 +206,19 @@ export function Section({ children }) {
   );
 }
 export function Icon({ type, size = 20, box = false }) {
-  const { theme } = useApp(),
-    meta = META[type],
-    color = theme.dark ? meta.dark : meta.color;
+  const meta = META[type];
   return (
     <View
-      style={
-        box
-          ? {
-              height: 60,
-              width: 60,
-              borderRadius: 20,
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: theme.dark ? meta.darkBg : meta.bg,
-            }
-          : undefined
-      }
+      style={{
+        height: box ? 60 : size + 12,
+        width: box ? 60 : size + 12,
+        borderRadius: box ? 20 : 9,
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: meta.vividBg,
+      }}
     >
-      <Feather name={meta.icon} color={color} size={size} />
+      <Feather name={meta.icon} color={meta.vividInk} size={size} />
     </View>
   );
 }

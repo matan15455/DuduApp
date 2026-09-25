@@ -109,6 +109,7 @@ export default function Day() {
             {TYPES.map((type) => (
               <Card key={type} style={{ padding: 0 }}>
                 <Button
+                  shiftType={type}
                   icon={META[type].icon}
                   title={`${META[type].label}${data.hours[type] ? ` · ${data.hours[type].join("–")}` : ""}`}
                   selected={info.type === type}

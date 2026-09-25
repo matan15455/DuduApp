@@ -2,7 +2,15 @@ import React, { useState } from "react";
 import { Alert, Share, View } from "react-native";
 import * as Clipboard from "expo-clipboard";
 import { useApp } from "../../state/AppProvider";
-import { addDays, iso, parse, shareText } from "../../lib/schedule";
+import {
+  addDays,
+  dayInfo,
+  iso,
+  META,
+  parse,
+  rangeDays,
+  shareText,
+} from "../../lib/schedule";
 import {
   Button,
   Card,
@@ -37,6 +45,8 @@ export default function ShareScreen() {
           ? iso(new Date(date.getFullYear(), date.getMonth() + 1, 0))
           : addDays(today, 6);
   const text = shareText(data, first, last, detail);
+  const days = rangeDays(first, last);
+  const previewLines = text.split("\n");
   return (
     <Screen
       footer={
@@ -112,9 +122,35 @@ export default function ShareScreen() {
       </Row>
       <Section>תצוגה מקדימה</Section>
       <Card>
-        <T selectable style={{ lineHeight: 29 }}>
-          {text || "בחר תאריך סיום שאינו לפני תאריך ההתחלה, בטווח של עד שנה."}
-        </T>
+        {text ? (
+          <>
+            <T selectable weight="bold">
+              {previewLines[0]}
+            </T>
+            {days.map((day, index) => {
+              const meta = META[dayInfo(data, day).type];
+              return (
+                <View
+                  key={day}
+                  style={{
+                    backgroundColor: meta.vividBg,
+                    borderRadius: 12,
+                    padding: 12,
+                  }}
+                >
+                  <T
+                    selectable
+                    style={{ color: meta.vividInk, lineHeight: 29 }}
+                  >
+                    {previewLines[index + 2]}
+                  </T>
+                </View>
+              );
+            })}
+          </>
+        ) : (
+          <T>בחר תאריך סיום שאינו לפני תאריך ההתחלה, בטווח של עד שנה.</T>
+        )}
       </Card>
     </Screen>
   );

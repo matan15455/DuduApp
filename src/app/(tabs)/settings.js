@@ -48,12 +48,19 @@ export default function Settings() {
       <Section>הסבב שלי</Section>
       <Card>
         {TYPES.slice(0, 4).map((type) => (
-          <Row key={type}>
+          <Row
+            key={type}
+            style={{
+              backgroundColor: META[type].vividBg,
+              borderRadius: 12,
+              padding: 8,
+            }}
+          >
             <Icon type={type} />
-            <T weight="bold" style={s.grow}>
+            <T weight="bold" style={[s.grow, { color: META[type].vividInk }]}>
               {META[type].label}
             </T>
-            <T size={19} muted>
+            <T size={19} style={{ color: META[type].vividInk }}>
               4 ימים
             </T>
           </Row>
@@ -67,9 +74,17 @@ export default function Settings() {
       <Section>שעות ברירת מחדל</Section>
       {TYPES.slice(0, 3).map((type) => (
         <Card key={type}>
-          <Row>
+          <Row
+            style={{
+              backgroundColor: META[type].vividBg,
+              borderRadius: 12,
+              padding: 8,
+            }}
+          >
             <Icon type={type} />
-            <T weight="bold">{META[type].label}</T>
+            <T weight="bold" style={{ color: META[type].vividInk }}>
+              {META[type].label}
+            </T>
           </Row>
           <Row>
             {["התחלה", "סיום"].map((label, index) => (

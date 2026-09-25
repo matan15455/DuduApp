@@ -1,11 +1,11 @@
 import React from "react";
-import { Pressable, ScrollView, View } from "react-native";
+import { Pressable, ScrollView, useWindowDimensions, View } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
 import { router } from "expo-router";
 import { useApp } from "../state/AppProvider";
 import { addDays, dayInfo, DOW, META, parse, shortDate } from "../lib/schedule";
 import { holiday } from "../lib/hebrew";
-import { Icon, Row, s, T } from "./ui";
+import { Row, s, T } from "./ui";
 
 function Markers({ info }) {
   const { theme } = useApp();
@@ -44,8 +44,24 @@ function Markers({ info }) {
     </Row>
   );
 }
-export default function CalendarPage({ anchor, mode, height }) {
+export default function CalendarPage({ anchor, mode, height, width }) {
   const { data, today, theme } = useApp();
+  const todayFill = theme.dark ? "#FFFFFF" : "#171717";
+  const todayInk = theme.dark ? "#171717" : "#FFFFFF";
+  const { fontScale } = useWindowDimensions();
+  const textScale = Math.max(1, fontScale);
+  const headerHeight = 28 * textScale;
+  const todayColumn =
+    anchor.slice(0, 7) === today.slice(0, 7) ? parse(today).getDay() : -1;
+  // Identical measured widths for headings, empty slots and populated cells.
+  // Neither text nor padding participates in column allocation.
+  const columnStyle = {
+    width: Math.max(0, (width - 2 - 6 * 4) / 7),
+    flexGrow: 0,
+    flexShrink: 0,
+    minWidth: 0,
+    overflow: "hidden",
+  };
   const month = anchor.slice(0, 7) + "-01",
     first = parse(month);
   const count = new Date(
@@ -55,7 +71,10 @@ export default function CalendarPage({ anchor, mode, height }) {
   ).getDate();
   const weekStart = addDays(anchor, -parse(anchor).getDay());
   const weeks = Math.ceil((count + first.getDay()) / 7);
-  const cellHeight = Math.max(88, (height - 26 - (weeks - 1) * 4) / weeks);
+  const cellHeight = Math.max(
+    120 * textScale,
+    (height - headerHeight - 6 - (weeks - 1) * 4) / weeks,
+  );
   const cells =
     mode === "week"
       ? Array.from({ length: 7 }, (_, i) => addDays(weekStart, i))
@@ -73,37 +92,73 @@ export default function CalendarPage({ anchor, mode, height }) {
       directionalLockEnabled
       bounces={false}
       showsVerticalScrollIndicator={false}
-      style={{ flex: 1 }}
-      contentContainerStyle={{ gap: 4, paddingHorizontal: 1, paddingBottom: 2 }}
+      style={{ flex: 1, width }}
+      contentContainerStyle={{
+        width,
+        gap: 4,
+        paddingHorizontal: 1,
+        paddingBottom: 2,
+      }}
     >
       {mode === "month" ? (
         <>
-          <Row style={{ gap: 4, height: 20 }}>
-            {["א׳", "ב׳", "ג׳", "ד׳", "ה׳", "ו׳", "ש׳"].map((day) => (
-              <T
+          <Row style={{ gap: 4, height: headerHeight, flexShrink: 0 }}>
+            {["א׳", "ב׳", "ג׳", "ד׳", "ה׳", "ו׳", "ש׳"].map((day, index) => (
+              <View
                 key={day}
-                size={13}
-                muted
-                weight="bold"
-                style={{ flex: 1, minWidth: 0, textAlign: "center" }}
+                style={[
+                  columnStyle,
+                  {
+                    height: headerHeight,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  },
+                ]}
               >
-                {day}
-              </T>
+                <T
+                  size={13}
+                  muted
+                  weight="bold"
+                  numberOfLines={1}
+                  accessibilityLabel={`${DOW[index]}${index === todayColumn ? ", היום" : ""}`}
+                  style={{
+                    textAlign: "center",
+                    minWidth: 26,
+                    paddingHorizontal: 4,
+                    paddingVertical: 2,
+                    borderRadius: 8,
+                    overflow: "hidden",
+                    ...(index === todayColumn
+                      ? { backgroundColor: todayFill, color: todayInk }
+                      : {}),
+                  }}
+                >
+                  {day}
+                </T>
+              </View>
             ))}
           </Row>
           {Array.from({ length: weeks }, (_, week) => (
-            <Row key={week} style={{ gap: 4, alignItems: "stretch" }}>
+            <Row
+              key={week}
+              style={{
+                gap: 4,
+                height: cellHeight,
+                flexShrink: 0,
+                alignItems: "stretch",
+              }}
+            >
               {cells.slice(week * 7, week * 7 + 7).map((day, col) => {
                 if (!day)
                   return (
                     <View
                       key={col}
-                      style={{ flex: 1, flexBasis: 0, minWidth: 0 }}
+                      style={[columnStyle, { height: cellHeight }]}
                     />
                   );
                 const info = dayInfo(data, day),
                   meta = META[info.type],
-                  color = theme.dark ? meta.dark : meta.color,
+                  color = meta.vividInk,
                   name = data.showHeb ? holiday(day) : "";
                 return (
                   <Pressable
@@ -112,17 +167,14 @@ export default function CalendarPage({ anchor, mode, height }) {
                     accessibilityLabel={`${shortDate(day)}, ${meta.label}${info.customHours ? `, שעות חריגות ${info.hours}` : ""}${info.typeChanged ? ", משמרת ששונתה" : ""}${info.note ? ", יש הערה" : ""}${name ? `, ${name}` : ""}`}
                     onPress={() => open(day)}
                     style={{
-                      flex: 1,
-                      flexBasis: 0,
-                      minWidth: 0,
-                      overflow: "hidden",
-                      minHeight: cellHeight,
+                      ...columnStyle,
+                      height: cellHeight,
                       padding: 2,
                       borderRadius: 12,
                       gap: 2,
-                      backgroundColor: theme.dark ? meta.darkBg : meta.bg,
+                      backgroundColor: meta.vividBg,
                       borderWidth: 1,
-                      borderColor: day === today ? theme.accent : "transparent",
+                      borderColor: day === today ? todayFill : "transparent",
                     }}
                   >
                     <Row style={{ gap: 0, justifyContent: "space-between" }}>
@@ -135,14 +187,15 @@ export default function CalendarPage({ anchor, mode, height }) {
                           textAlign: "center",
                           borderRadius: 12,
                           overflow: "hidden",
+                          color,
                           ...(day === today
-                            ? { color: theme.bg, backgroundColor: theme.ink }
+                            ? { color: todayInk, backgroundColor: todayFill }
                             : {}),
                         }}
                       >
                         {parse(day).getDate()}
                       </T>
-                      <Icon type={info.type} size={12} />
+                      <Feather name={meta.icon} size={12} color={color} />
                     </Row>
                     <T
                       size={11}
@@ -173,7 +226,7 @@ export default function CalendarPage({ anchor, mode, height }) {
                         size={9}
                         muted
                         numberOfLines={2}
-                        style={{ lineHeight: 11 }}
+                        style={{ lineHeight: 11, color }}
                       >
                         {name}
                       </T>
@@ -189,7 +242,7 @@ export default function CalendarPage({ anchor, mode, height }) {
         cells.map((day) => {
           const info = dayInfo(data, day),
             meta = META[info.type],
-            color = theme.dark ? meta.dark : meta.color,
+            color = meta.vividInk,
             name = data.showHeb ? holiday(day) : "";
           return (
             <Pressable
@@ -233,25 +286,28 @@ export default function CalendarPage({ anchor, mode, height }) {
                     minWidth: 0,
                     padding: 12,
                     gap: 5,
-                    backgroundColor: theme.dark ? meta.darkBg : meta.bg,
+                    backgroundColor: meta.vividBg,
                   }}
                 >
                   <Row>
-                    <Icon type={info.type} size={22} />
+                    <Feather name={meta.icon} size={22} color={color} />
                     <T size={20} weight="heavy" style={{ color }}>
                       {meta.label}
                     </T>
                   </Row>
-                  <T size={15} style={info.work ? s.numbers : undefined}>
+                  <T
+                    size={15}
+                    style={[info.work ? s.numbers : undefined, { color }]}
+                  >
                     {info.work ? info.hours : "ללא משמרת"}
                   </T>
                   {info.customHours && (
-                    <T size={12} weight="bold">
+                    <T size={12} weight="bold" style={{ color }}>
                       ◷ שעות חריגות
                     </T>
                   )}
                   {!!name && (
-                    <T size={12} muted>
+                    <T size={12} style={{ color }}>
                       {name}
                     </T>
                   )}
