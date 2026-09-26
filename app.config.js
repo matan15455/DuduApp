@@ -1,0 +1,27 @@
+module.exports = ({ config }) => {
+  // A local Gemini key is for development only, even when EAS loads .env.
+  const profile = process.env.EAS_BUILD_PROFILE;
+  if (
+    profile &&
+    !["development", "simulator"].includes(profile) &&
+    process.env.EXPO_PUBLIC_GEMINI_API_KEY?.trim()
+  ) {
+    throw new Error(
+      "Remove EXPO_PUBLIC_GEMINI_API_KEY before a distribution build. Move Gemini to a server before enabling import in TestFlight.",
+    );
+  }
+  // Metro serves this manifest during local development. This fallback avoids
+  // relying exclusively on Expo's virtual env module in a running dev client.
+  // Do not include it in EAS binaries or production exports.
+  const extra = { ...config.extra };
+  delete extra.localGeminiApiKey;
+  if (
+    process.env.NODE_ENV === "development" &&
+    !profile &&
+    !process.env.EAS_BUILD
+  ) {
+    const key = process.env.EXPO_PUBLIC_GEMINI_API_KEY?.trim();
+    if (key) extra.localGeminiApiKey = key;
+  }
+  return { ...config, extra };
+};

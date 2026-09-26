@@ -32,7 +32,7 @@ export default function ShiftCard({
         <Icon type={info.type} size={28} box />
         <View style={s.grow}>
           <T
-            size={hero ? 36 : 29}
+            size={meta.secondaryBg ? 24 : hero ? 36 : 29}
             weight="heavy"
             style={tint ? { color: meta.vividInk } : undefined}
           >
@@ -50,6 +50,15 @@ export default function ShiftCard({
           </T>
         </View>
       </Row>
+      {meta.secondaryBg && (
+        <View
+          style={{
+            height: 4,
+            borderRadius: 2,
+            backgroundColor: meta.secondaryBg,
+          }}
+        />
+      )}
       {!!badges.length && (
         <View style={s.wrap}>
           {badges.map((b) => (

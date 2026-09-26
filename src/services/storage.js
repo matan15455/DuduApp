@@ -12,7 +12,11 @@ export async function readData() {
     !/^\d{4}-\d{2}-\d{2}$/.test(saved.cycleStart)
   )
     throw new Error("Invalid saved data");
-  return { ...initialData(), ...saved };
+  return {
+    ...initialData(),
+    ...saved,
+    hours: { ...initialData().hours, ...saved.hours },
+  };
 }
 let writes = Promise.resolve();
 export function saveData(data) {

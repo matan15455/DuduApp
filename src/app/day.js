@@ -27,6 +27,7 @@ export default function Day() {
     [start, setStart] = useState(info.start),
     [end, setEnd] = useState(info.end),
     [note, setNote] = useState(info.note);
+  const [special, setSpecial] = useState(false);
   const done = (message) => {
     setMode("details");
     notify(message);
@@ -68,6 +69,7 @@ export default function Day() {
                 onPress={() => {
                   setStart(info.start);
                   setEnd(info.end);
+                  setSpecial(info.type === "special");
                   setMode("hours");
                 }}
               />
@@ -114,6 +116,13 @@ export default function Day() {
                   title={`${META[type].label}${data.hours[type] ? ` · ${data.hours[type].join("–")}` : ""}`}
                   selected={info.type === type}
                   onPress={() => {
+                    if (type === "special") {
+                      setSpecial(true);
+                      setStart(info.start || "11:00");
+                      setEnd(info.end || "19:00");
+                      setMode("hours");
+                      return;
+                    }
                     editDay(day, (o) => ({
                       note: o.note,
                       ...(type !== info.base ? { type } : {}),
@@ -149,8 +158,14 @@ export default function Day() {
             <Button
               title="שמור שעות ליום הזה"
               primary
+              disabled={start === end}
               onPress={() => {
-                editDay(day, (o) => ({ ...o, start, end }));
+                editDay(day, (o) => ({
+                  ...o,
+                  ...(special ? { type: "special" } : {}),
+                  start,
+                  end,
+                }));
                 done("השעות נשמרו ליום הזה");
               }}
             />

@@ -78,8 +78,8 @@ const ShiftsWidget = (props, environment) => {
           modifiers={[
             font({ size: 28, weight: "bold" }),
             foregroundStyle(nextInk),
-            lineLimit(1),
-            minimumScaleFactor(0.75),
+            lineLimit(2),
+            minimumScaleFactor(0.65),
           ]}
         >
           {next?.label || "אין משמרת קרובה"}
@@ -98,9 +98,11 @@ const ShiftsWidget = (props, environment) => {
           modifiers={[
             font({ size: 23, weight: "semibold" }),
             foregroundStyle(nextInk),
+            lineLimit(1),
+            minimumScaleFactor(0.65),
           ]}
         >
-          {next?.start || ""}
+          {next?.hours || next?.start || ""}
         </Text>
         {next?.customHours && (
           <Text
@@ -170,7 +172,7 @@ const ShiftsWidget = (props, environment) => {
                 modifiers={[
                   font({ size: 20, weight: "bold" }),
                   foregroundStyle(fullColor ? row.ink || ink : ink),
-                  lineLimit(1),
+                  lineLimit(2),
                   minimumScaleFactor(0.75),
                 ]}
               >
@@ -276,6 +278,8 @@ const ShiftsWidget = (props, environment) => {
               modifiers={[
                 font({ size: 14, weight: "semibold" }),
                 foregroundStyle(fullColor ? row.ink || ink : ink),
+                lineLimit(2),
+                minimumScaleFactor(0.75),
               ]}
             >
               {row.label}

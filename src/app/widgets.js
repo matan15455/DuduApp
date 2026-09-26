@@ -67,7 +67,13 @@ export default function Widgets() {
             style={{ alignSelf: "flex-end" }}
           />
         )}
-        <T size={29} weight="heavy" style={{ color: nextMeta?.vividInk }}>
+        <T
+          size={24}
+          weight="heavy"
+          numberOfLines={2}
+          adjustsFontSizeToFit
+          style={{ color: nextMeta?.vividInk }}
+        >
           {next ? META[next.type].label : "אין משמרת"}
         </T>
         {next && (
@@ -75,8 +81,13 @@ export default function Widgets() {
             <T style={{ color: nextMeta.vividInk }}>
               {relativeDay(next.day, today)}
             </T>
-            <T size={24} style={[s.numbers, { color: nextMeta.vividInk }]}>
-              {next.start}
+            <T
+              size={21}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              style={[s.numbers, { color: nextMeta.vividInk }]}
+            >
+              {next.hours}
             </T>
             {next.customHours && (
               <T size={12} weight="bold" style={{ color: nextMeta.vividInk }}>

@@ -45,6 +45,13 @@ export default function Settings() {
   }
   return (
     <Screen title="הגדרות">
+      {__DEV__ && (
+        <Button
+          title="ייבוא סידור עבודה מ־Excel"
+          icon="upload"
+          onPress={() => router.push("/import")}
+        />
+      )}
       <Section>הסבב שלי</Section>
       <Card>
         {TYPES.slice(0, 4).map((type) => (
@@ -72,43 +79,48 @@ export default function Settings() {
         />
       </Card>
       <Section>שעות ברירת מחדל</Section>
-      {TYPES.slice(0, 3).map((type) => (
-        <Card key={type}>
-          <Row
-            style={{
-              backgroundColor: META[type].vividBg,
-              borderRadius: 12,
-              padding: 8,
-            }}
-          >
-            <Icon type={type} />
-            <T weight="bold" style={{ color: META[type].vividInk }}>
-              {META[type].label}
-            </T>
-          </Row>
-          <Row>
-            {["התחלה", "סיום"].map((label, index) => (
-              <PickerField
-                key={label}
-                label={label}
-                mode="time"
-                value={data.hours[type][index]}
-                onChange={(value) =>
-                  update((d) => ({
-                    ...d,
-                    hours: {
-                      ...d.hours,
-                      [type]: d.hours[type].map((h, i) =>
-                        i === index ? value : h,
-                      ),
-                    },
-                  }))
-                }
-              />
-            ))}
-          </Row>
-        </Card>
-      ))}
+      <T size={14} muted>
+        גם משמרות כפולות משתמשות בשעות האלו. אפשר לשנות אותן לפני ייבוא הסידור.
+      </T>
+      {TYPES.filter((type) => type !== "off" && type !== "special").map(
+        (type) => (
+          <Card key={type}>
+            <Row
+              style={{
+                backgroundColor: META[type].vividBg,
+                borderRadius: 12,
+                padding: 8,
+              }}
+            >
+              <Icon type={type} />
+              <T weight="bold" style={{ color: META[type].vividInk }}>
+                {META[type].label}
+              </T>
+            </Row>
+            <Row>
+              {["התחלה", "סיום"].map((label, index) => (
+                <PickerField
+                  key={label}
+                  label={label}
+                  mode="time"
+                  value={data.hours[type][index]}
+                  onChange={(value) =>
+                    update((d) => ({
+                      ...d,
+                      hours: {
+                        ...d.hours,
+                        [type]: d.hours[type].map((h, i) =>
+                          i === index ? value : h,
+                        ),
+                      },
+                    }))
+                  }
+                />
+              ))}
+            </Row>
+          </Card>
+        ),
+      )}
       <Section>תזכורות</Section>
       <Card>
         <Row>

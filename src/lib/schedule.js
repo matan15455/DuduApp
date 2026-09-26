@@ -1,4 +1,4 @@
-/** @typedef {'morning'|'afternoon'|'night'|'off'|'taken'} ShiftType */
+/** @typedef {'morning'|'afternoon'|'night'|'off'|'morningAfternoon'|'afternoonNight'|'special'|'taken'} ShiftType */
 /** @typedef {{type?: ShiftType, start?: string, end?: string, note?: string}} Override */
 /** @typedef {{version: number, configured: boolean, cycleStart: string, hours: Record<string, string[]>, overrides: Record<string, Override>, reminder: {on: boolean, mode: string, lead: number, at: string}, showHeb: boolean, theme: string}} AppData */
 
@@ -7,6 +7,9 @@ export const TYPES = /** @type {ShiftType[]} */ ([
   "afternoon",
   "night",
   "off",
+  "morningAfternoon",
+  "afternoonNight",
+  "special",
 ]);
 export const META = {
   morning: {
@@ -40,6 +43,32 @@ export const META = {
     vividBg: "#35E875",
     vividInk: "#062A14",
     symbol: "house.fill",
+  },
+  morningAfternoon: {
+    label: "בוקר + צהריים",
+    short: "בוקר+\nצהריים",
+    icon: "layers",
+    vividBg: "#FFE000",
+    vividInk: "#211B00",
+    symbol: "square.stack.fill",
+    secondaryBg: "#FF851B",
+  },
+  afternoonNight: {
+    label: "צהריים + לילה",
+    short: "צהריים+\nלילה",
+    icon: "layers",
+    vividBg: "#FF851B",
+    vividInk: "#281100",
+    symbol: "square.stack.fill",
+    secondaryBg: "#2455E8",
+  },
+  special: {
+    label: "מיוחדת",
+    short: "מיוחדת",
+    icon: "clock",
+    vividBg: "#A855F7",
+    vividInk: "#FFFFFF",
+    symbol: "clock.fill",
   },
 };
 export const DOW = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
@@ -94,6 +123,8 @@ export function initialData() {
       morning: ["06:00", "14:00"],
       afternoon: ["14:00", "22:00"],
       night: ["22:00", "06:00"],
+      morningAfternoon: ["06:00", "22:00"],
+      afternoonNight: ["14:00", "06:00"],
     },
     overrides: {},
     reminder: { on: false, mode: "before", lead: 60, at: "20:00" },
@@ -110,14 +141,16 @@ export function dayInfo(data, day) {
   const override = data.overrides[day] || {},
     // Keep previously saved leave days compatible with the unified off type.
     type = override.type === "taken" ? "off" : override.type || base;
-  const work = ["morning", "afternoon", "night"].includes(type),
-    defaults = data.hours[type];
+  const work = type !== "off",
+    defaults =
+      data.hours[type] ||
+      (type === "special" ? ["", ""] : initialData().hours[type]);
   const start = work ? override.start || defaults[0] : "",
     end = work ? override.end || defaults[1] : "";
   const customHours =
     work &&
     !!(override.start || override.end) &&
-    (start !== defaults[0] || end !== defaults[1]);
+    (type === "special" || start !== defaults[0] || end !== defaults[1]);
   return {
     day,
     index,

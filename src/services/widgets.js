@@ -31,6 +31,7 @@ export function widgetProps(data, now) {
           symbol: META[next.type].symbol,
           when: `${relativeDay(next.day, today)} · ${shortDate(next.day)}`,
           start: next.start,
+          hours: next.hours,
           customHours: next.customHours,
         }
       : null,

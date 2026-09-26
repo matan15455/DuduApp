@@ -55,6 +55,7 @@ export default function CalendarPage({ anchor, mode, height, width }) {
     anchor.slice(0, 7) === today.slice(0, 7) ? parse(today).getDay() : -1;
   // Identical measured widths for headings, empty slots and populated cells.
   // Neither text nor padding participates in column allocation.
+  /** @type {import('react-native').ViewStyle} */
   const columnStyle = {
     width: Math.max(0, (width - 2 - 6 * 4) / 7),
     flexGrow: 0,
@@ -200,11 +201,20 @@ export default function CalendarPage({ anchor, mode, height, width }) {
                     <T
                       size={11}
                       weight="heavy"
-                      numberOfLines={1}
+                      numberOfLines={meta.secondaryBg ? 2 : 1}
                       style={{ color }}
                     >
                       {meta.short}
                     </T>
+                    {meta.secondaryBg && (
+                      <View
+                        style={{
+                          height: 3,
+                          borderRadius: 2,
+                          backgroundColor: meta.secondaryBg,
+                        }}
+                      />
+                    )}
                     {info.customHours && (
                       <View>
                         <T

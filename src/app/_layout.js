@@ -74,6 +74,7 @@ function Navigator() {
           }}
         />
         <Stack.Screen name="widgets" />
+        <Stack.Screen name="import" />
       </Stack>
       {!!toast && (
         <View
