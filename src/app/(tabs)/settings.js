@@ -77,9 +77,6 @@ export default function Settings() {
         />
       </Card>
       <Section>שעות ברירת מחדל</Section>
-      <T size={14} muted>
-        גם משמרות כפולות משתמשות בשעות האלו. אפשר לשנות אותן לפני ייבוא הסידור.
-      </T>
       {TYPES.filter((type) => type !== "off" && type !== "special").map(
         (type) => (
           <Card key={type}>
@@ -207,10 +204,6 @@ export default function Settings() {
             />
           ))}
         </Row>
-        <Button
-          title="ווידג׳טים למסך הבית  ‹"
-          onPress={() => router.push("/widgets")}
-        />
       </Card>
       <Button
         title="אפס את כל השינויים הידניים"
