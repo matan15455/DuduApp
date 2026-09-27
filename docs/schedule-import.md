@@ -1,47 +1,10 @@
-# ייבוא סידור העבודה — חיבור ישיר ל־Gemini
+# ייבוא סידור העבודה
 
-הייבוא נמצא בכפתור ״ייבוא״ בלוח ובהגדרות, גם ב־Production, לפי בחירת בעל האפליקציה להפצה פרטית. המפתח כלול באפליקציה וניתן לחילוץ. הקובץ נקרא במכשיר; רק התאריכים, המשמרות והשינויים של דודו נשלחים ל־Gemini. תוצאות מוצגות לבדיקה ורק אישור המשתמש משנה את הלוח.
+Gemini runs only on the Cloudflare Worker in development and production. The app sends extracted shift cells, never the Gemini API key.
 
-## חיבור
+Setup and deployment: [server/import-worker/README.md](../server/import-worker/README.md).
 
-1. צור מפתח ב־[Google AI Studio](https://aistudio.google.com/api-keys) בפרויקט Free ללא חשבון חיוב מקושר.
-2. בקובץ `.env` בשורש הפרויקט מלא מקומית:
-
-   ```dotenv
-   EXPO_PUBLIC_GEMINI_API_KEY=YOUR_KEY
-   ```
-
-   אין לשלוח את המפתח בצ׳אט. `.env` מוחרג מ־Git. משתנה EXPO_PUBLIC מוכנס לקוד האפליקציה ואינו סוד, גם בהפצת TestFlight פרטית.
-
-   לבניית ענן: הגדר בפרויקט Expo את `EXPO_PUBLIC_GEMINI_API_KEY` בסביבת `production`, עם נראות `Sensitive`. קובץ `.env` המקומי אינו מועלה ל־EAS. נראות זו מסתירה את הערך בתצוגות השירות, אך אינה מסתירה אותו בתוך האפליקציה. לאחר מכן הרץ `npx.cmd eas-cli@latest build --platform ios --profile production`.
-
-   בפיתוח מקומי המפתח מועבר גם דרך הגדרות Expo כגיבוי לטעינת משתני הסביבה. גיבוי זה אינו נוסף לבניות EAS או לייצוא production. גם תצורת הפיתוח מכילה מפתח גלוי: אין לשתף פלט של `expo config` כשהמפתח מוגדר.
-3. נדרשת בניית פיתוח חדשה להתקנת בוחר הקבצים:
-
-   ```powershell
-   npx.cmd eas-cli@latest build --platform ios --profile development
-   ```
-
-4. התקן את הבנייה והפעל את Metro מחדש:
-
-   ```powershell
-   npx.cmd expo start --dev-client --clear
-   ```
-
-5. בהגדרות בחר את שעות בוקר+צהריים וצהריים+לילה. ברירות המחדל הראשוניות הן 06:00–22:00 ו־14:00–06:00, וניתן לשנותן.
-6. בחר קובץ `.xlsx`, קרא את התקופה שזוהתה, לחץ ״זהה את המשמרות״, בדוק וערוך את התוצאות ואז אשר. לא ברור = לא נבחר אוטומטית. אפשר לבטל את הייבוא האחרון דרך אותו מסך.
-
-## מודל ומכסות
-
-המודל המוגדר כעת בקוד הוא `gemini-3.1-flash-lite`. יש לבדוק את המכסות והזמינות לפרויקט ב־AI Studio; לא בוצעה קריאת Gemini חיה במסגרת שינוי ההפצה.
-
-- [מודלים](https://ai.google.dev/gemini-api/docs/models)
-- [תמחור](https://ai.google.dev/gemini-api/docs/pricing)
-- [מכסות](https://ai.google.dev/gemini-api/docs/rate-limits)
-- [API](https://ai.google.dev/api/generate-content)
-- [פלט מובנה](https://ai.google.dev/gemini-api/docs/structured-output)
-
-בקשה אחת לכל לחיצה, ללא ניסיונות חוזרים או החלפת מודל אוטומטית, וזמן המתנה מרבי של דקה. HTTP 429 מוצג כהודעת מכסה. אין בקשת API שמבטיחה חינם כשהפרויקט בתשלום: האחריות להישאר ב־Free היא בהגדרת הפרויקט ב־Google. המכסות בפועל מופיעות ב־AI Studio. תוכן שנשלח במסלול Free עשוי לשמש לשיפור מוצרי Google; מוצגת על כך הודעה לפני הזיהוי.
+Model: gemini-3.1-flash-lite. No automatic retries or model fallback. Review and approval are still required before calendar changes.
 
 ## כללי פענוח
 
@@ -55,10 +18,3 @@
 - הייבוא נשמר במנגנון הרגיל ומעדכן תזכורות ווידג׳טים. ביטול מחזיר את המשמרות הקודמות, אך אינו מחליף משמרות/שעות שנערכו מאז ושומר הערות עדכניות.
 - נתמכים קובצי xlsx עד 5MB וגיליון עד 250 שורות/100 עמודות, עם צבעי מילוי ישירים. צבע שמקורו בעיצוב מותנה אינו נתמך; יש לשמור אותו כמילוי רגיל לפני הייבוא. תאים ממוזגים נקראים מהתא הראשי.
 
-## לפני TestFlight
-
-לפי בקשת בעל האפליקציה הוסרו חסימות הפיתוח והבנייה. המפתח נשאר גלוי בחבילת האפליקציה. בהמשך, מעבר לשרת יצריך הסרת המפתח מהלקוח והחלפתו. טרם בוצעה בנייה או העלאה ל־TestFlight במסגרת שינוי זה.
-
-תלויות: expo-document-picker לבחירה, expo-file-system לקריאה, SheetJS 0.20.3 ממקורו הרשמי לקריאת התאים והצבעים. אין SDK נוסף של Gemini; משתמשים ב־REST.
-
-מקורות: [Expo DocumentPicker 57](https://docs.expo.dev/versions/v57.0.0/sdk/document-picker/), [Expo FileSystem](https://docs.expo.dev/versions/latest/sdk/filesystem/), [SheetJS parsing](https://docs.sheetjs.com/docs/api/parse-options/), [SheetJS installation](https://docs.sheetjs.com/docs/getting-started/installation/nodejs/).

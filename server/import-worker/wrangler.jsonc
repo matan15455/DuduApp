@@ -1,0 +1,14 @@
+{
+  "name": "dudu-shifts-import",
+  "main": "index.mjs",
+  "compatibility_date": "2026-09-01",
+  "workers_dev": true,
+  "observability": { "enabled": false },
+  "ratelimits": [
+    {
+      "name": "IMPORT_LIMIT",
+      "namespace_id": "271901",
+      "simple": { "limit": 3, "period": 60 },
+    },
+  ],
+}
