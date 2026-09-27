@@ -203,6 +203,7 @@ const ShiftsWidget = (props, environment) => {
                   ◷ שעות חריגות
                 </Text>
               )}
+
               {!!row.holiday && (
                 <Text
                   modifiers={[

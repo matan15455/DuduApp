@@ -209,8 +209,8 @@ export default function CalendarPage({ anchor, mode, height, width }) {
                     {meta.secondaryBg && (
                       <View
                         style={{
-                          height: 3,
-                          borderRadius: 2,
+                          height: 7,
+                          borderRadius: 4,
                           backgroundColor: meta.secondaryBg,
                         }}
                       />
@@ -311,6 +311,15 @@ export default function CalendarPage({ anchor, mode, height, width }) {
                   >
                     {info.work ? info.hours : "ללא משמרת"}
                   </T>
+                  {meta.secondaryBg && (
+                    <View
+                      style={{
+                        height: 7,
+                        borderRadius: 4,
+                        backgroundColor: meta.secondaryBg,
+                      }}
+                    />
+                  )}
                   {info.customHours && (
                     <T size={12} weight="bold" style={{ color }}>
                       ◷ שעות חריגות

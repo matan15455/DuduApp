@@ -75,6 +75,16 @@ export default function DayRows({ days }) {
                 )}
               </View>
             </Row>
+            {meta.secondaryBg && (
+              <View
+                style={{
+                  height: 7,
+                  borderRadius: 4,
+                  marginTop: 8,
+                  backgroundColor: meta.secondaryBg,
+                }}
+              />
+            )}
           </Pressable>
         );
       })}

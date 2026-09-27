@@ -85,6 +85,7 @@ export function Button({
       style={({ pressed }) => [
         s.button,
         {
+          overflow: "hidden",
           backgroundColor: shift
             ? shift.vividBg
             : primary
@@ -134,6 +135,19 @@ export function Button({
           <Feather name="check-circle" size={20} color={shift.vividInk} />
         )}
       </Row>
+      {shift?.secondaryBg && (
+        <View
+          style={{
+            position: "absolute",
+            left: 10,
+            right: 10,
+            bottom: 5,
+            height: 6,
+            borderRadius: 4,
+            backgroundColor: shift.secondaryBg,
+          }}
+        />
+      )}
     </Pressable>
   );
 }
@@ -144,6 +158,7 @@ export function Screen({
   style = undefined,
   scroll = true,
   footer = undefined,
+  header = undefined,
 }) {
   const { theme, error, retrySave } = useApp();
   const Content = scroll ? ScrollView : View;
@@ -152,11 +167,19 @@ export function Screen({
       edges={["top", "left", "right"]}
       style={{ flex: 1, direction: "ltr", backgroundColor: theme.bg }}
     >
+      {header && (
+        <View
+          collapsable={false}
+          style={{ flexShrink: 0, backgroundColor: theme.bg }}
+        >
+          {header}
+        </View>
+      )}
       <Content
         {...(scroll
           ? {
               keyboardShouldPersistTaps: "handled",
-              style: { flex: 1 },
+              style: { flex: 1, minHeight: 0, overflow: "hidden" },
               contentContainerStyle: [s.screen, style],
             }
           : { style: [s.screen, { flex: 1 }, style] })}

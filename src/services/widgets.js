@@ -12,6 +12,13 @@ import {
 } from "../lib/schedule";
 import { holiday } from "../lib/hebrew";
 
+export function widgetMeta(type) {
+  const meta = META[type];
+  return meta.secondaryBg
+    ? { ...meta, vividBg: "#FF003D", vividInk: "#190008" }
+    : meta;
+}
+
 export function widgetsAvailable() {
   return (
     Platform.OS === "ios" && requireOptionalNativeModule("ExpoWidgets") !== null
@@ -26,8 +33,9 @@ export function widgetProps(data, now) {
     next: next
       ? {
           label: META[next.type].label,
-          fill: META[next.type].vividBg,
-          ink: META[next.type].vividInk,
+          fill: widgetMeta(next.type).vividBg,
+          ink: widgetMeta(next.type).vividInk,
+          stripe: META[next.type].secondaryBg || "",
           symbol: META[next.type].symbol,
           when: `${relativeDay(next.day, today)} · ${shortDate(next.day)}`,
           start: next.start,
@@ -43,8 +51,9 @@ export function widgetProps(data, now) {
         date: shortDate(day),
         customHours: info.customHours,
         label: META[info.type].label,
-        fill: META[info.type].vividBg,
-        ink: META[info.type].vividInk,
+        fill: widgetMeta(info.type).vividBg,
+        ink: widgetMeta(info.type).vividInk,
+        stripe: META[info.type].secondaryBg || "",
         symbol: META[info.type].symbol,
         when: index === 2 ? "מחרתיים" : relativeDay(day, today),
         hours: info.work ? info.hours : "—",

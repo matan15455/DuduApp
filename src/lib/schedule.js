@@ -51,7 +51,7 @@ export const META = {
     vividBg: "#FFE000",
     vividInk: "#211B00",
     symbol: "square.stack.fill",
-    secondaryBg: "#FF851B",
+    secondaryBg: "#FF003D",
   },
   afternoonNight: {
     label: "צהריים + לילה",
@@ -60,7 +60,7 @@ export const META = {
     vividBg: "#FF851B",
     vividInk: "#281100",
     symbol: "square.stack.fill",
-    secondaryBg: "#2455E8",
+    secondaryBg: "#FF003D",
   },
   special: {
     label: "מיוחדת",

@@ -5,9 +5,7 @@ import { useApp } from "../../state/AppProvider";
 import {
   addDays,
   dayInfo,
-  iso,
   META,
-  parse,
   rangeDays,
   shareText,
 } from "../../lib/schedule";
@@ -23,29 +21,11 @@ import {
 } from "../../components/ui";
 export default function ShareScreen() {
   const { data, today, notify } = useApp(),
-    [range, setRange] = useState("7"),
     [detail, setDetail] = useState(false),
     [from, setFrom] = useState(today),
     [to, setTo] = useState(addDays(today, 6));
-  const date = parse(today);
-  const first =
-    range === "custom"
-      ? from
-      : range === "week"
-        ? addDays(today, -date.getDay())
-        : range === "month"
-          ? today.slice(0, 7) + "-01"
-          : today;
-  const last =
-    range === "custom"
-      ? to
-      : range === "week"
-        ? addDays(first, 6)
-        : range === "month"
-          ? iso(new Date(date.getFullYear(), date.getMonth() + 1, 0))
-          : addDays(today, 6);
-  const text = shareText(data, first, last, detail);
-  const days = rangeDays(first, last);
+  const text = shareText(data, from, to, detail);
+  const days = rangeDays(from, to);
   const previewLines = text.split("\n");
   return (
     <Screen
@@ -84,27 +64,10 @@ export default function ShareScreen() {
       title="שיתוף המשמרות"
     >
       <Section>טווח</Section>
-      <View style={s.wrap}>
-        {[
-          ["7", "7 הימים הקרובים"],
-          ["week", "השבוע הנוכחי"],
-          ["month", "החודש הנוכחי"],
-          ["custom", "טווח ידני"],
-        ].map(([key, label]) => (
-          <Button
-            key={key}
-            title={label}
-            selected={range === key}
-            onPress={() => setRange(key)}
-          />
-        ))}
-      </View>
-      {range === "custom" && (
-        <Card>
-          <PickerField label="מתאריך" value={from} onChange={setFrom} />
-          <PickerField label="עד תאריך" value={to} onChange={setTo} />
-        </Card>
-      )}
+      <Card>
+        <PickerField label="מתאריך" value={from} onChange={setFrom} />
+        <PickerField label="עד תאריך" value={to} onChange={setTo} />
+      </Card>
       <Section>רמת פירוט</Section>
       <Row>
         <Button

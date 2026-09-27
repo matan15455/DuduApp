@@ -45,13 +45,11 @@ export default function Settings() {
   }
   return (
     <Screen title="הגדרות">
-      {__DEV__ && (
-        <Button
-          title="ייבוא סידור עבודה מ־Excel"
-          icon="upload"
-          onPress={() => router.push("/import")}
-        />
-      )}
+      <Button
+        title="ייבוא סידור עבודה מ־Excel"
+        icon="upload"
+        onPress={() => router.push("/import")}
+      />
       <Section>הסבב שלי</Section>
       <Card>
         {TYPES.slice(0, 4).map((type) => (

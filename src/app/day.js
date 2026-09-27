@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { KeyboardAvoidingView, TextInput } from "react-native";
+import { KeyboardAvoidingView, TextInput, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { useApp } from "../state/AppProvider";
 import {
@@ -37,26 +37,64 @@ export default function Day() {
       behavior="padding"
       style={{ flex: 1, direction: "ltr" }}
     >
-      <Screen style={{ paddingTop: 28 }}>
-        <Row style={{ justifyContent: "space-between" }}>
-          <T size={23} weight="heavy">
-            {mode === "details"
-              ? longDate(day)
-              : mode === "shift"
-                ? "שנה משמרת"
-                : mode === "hours"
-                  ? "שעות ליום הזה"
-                  : "הערה ליום"}
-          </T>
-          <Button
-            title="סגור"
-            onPress={() => router.back()}
-            style={{ minHeight: 44 }}
-          />
-        </Row>
-        {data.showHeb && (
-          <T muted size={14}>
-            {hebrewDate(day)}
+      <Screen
+        header={
+          <Row
+            style={{
+              paddingHorizontal: 16,
+              paddingTop: 16,
+              paddingBottom: 8,
+              gap: 6,
+              width: "100%",
+              minHeight: 88,
+              flexShrink: 0,
+              backgroundColor: theme.bg,
+            }}
+          >
+            <Button
+              title="חזור"
+              onPress={() =>
+                mode === "details" ? router.back() : setMode("details")
+              }
+              style={{ width: 64, flexShrink: 0, paddingHorizontal: 6 }}
+            />
+            <View style={{ flex: 1, minWidth: 0, overflow: "hidden", gap: 2 }}>
+              <T
+                size={19}
+                weight="heavy"
+                numberOfLines={2}
+                adjustsFontSizeToFit
+                style={{ textAlign: "center" }}
+              >
+                {longDate(day)}
+              </T>
+              {data.showHeb && (
+                <T
+                  muted
+                  size={12}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  style={{ textAlign: "center" }}
+                >
+                  {hebrewDate(day)}
+                </T>
+              )}
+            </View>
+            <Button
+              title="סגור"
+              onPress={() => router.back()}
+              style={{ width: 64, flexShrink: 0, paddingHorizontal: 6 }}
+            />
+          </Row>
+        }
+      >
+        {mode !== "details" && (
+          <T size={20} weight="heavy">
+            {mode === "shift"
+              ? "שנה משמרת"
+              : mode === "hours"
+                ? "שעות ליום הזה"
+                : "הערה ליום"}
           </T>
         )}
         {mode === "details" && (
@@ -74,19 +112,6 @@ export default function Day() {
                 }}
               />
             )}
-            {(info.work || (info.type === "off" && info.typeChanged)) && (
-              <Button
-                title={info.type === "off" ? "בטל חופש" : "סמן כחופש"}
-                onPress={() => {
-                  editDay(day, (o) =>
-                    info.type === "off"
-                      ? resetOverride(o)
-                      : { note: o.note, type: "off" },
-                  );
-                  done("היום עודכן");
-                }}
-              />
-            )}
             <Button
               title={info.note ? "ערוך הערה" : "הוסף הערה"}
               onPress={() => {
@@ -96,7 +121,6 @@ export default function Day() {
             />
             {info.changed && (
               <Button
-                primary
                 title="החזר לפי הסבב"
                 onPress={() => {
                   editDay(day, resetOverride);
@@ -205,18 +229,6 @@ export default function Day() {
               }}
             />
           </>
-        )}
-        {mode !== "details" && (
-          <Button
-            title="חזור ללא שינוי"
-            icon="arrow-right"
-            onPress={() => setMode("details")}
-            style={{
-              backgroundColor: theme.soft,
-              borderColor: "transparent",
-              marginTop: 12,
-            }}
-          />
         )}
       </Screen>
     </KeyboardAvoidingView>

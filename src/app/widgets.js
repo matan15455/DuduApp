@@ -13,11 +13,11 @@ import {
 } from "../lib/schedule";
 import { Button, Card, Row, s, Screen, Section, T } from "../components/ui";
 import { holiday } from "../lib/hebrew";
-import { widgetsAvailable } from "../services/widgets";
+import { widgetMeta, widgetsAvailable } from "../services/widgets";
 export default function Widgets() {
   const { data, today, now } = useApp(),
     next = nextShift(data, now),
-    nextMeta = next ? META[next.type] : null;
+    nextMeta = next ? widgetMeta(next.type) : null;
   return (
     <Screen title="ווידג׳טים">
       <Button title="› חזרה להגדרות" onPress={() => router.back()} />
@@ -94,6 +94,15 @@ export default function Widgets() {
                 ◷ שעות חריגות
               </T>
             )}
+            {nextMeta.secondaryBg && (
+              <View
+                style={{
+                  height: 7,
+                  borderRadius: 4,
+                  backgroundColor: nextMeta.secondaryBg,
+                }}
+              />
+            )}
           </>
         )}
       </Card>
@@ -102,7 +111,7 @@ export default function Widgets() {
         <Row style={{ gap: 6, alignItems: "stretch" }}>
           {[today, addDays(today, 1), addDays(today, 2)].map((day, index) => {
             const info = dayInfo(data, day),
-              meta = META[info.type];
+              meta = widgetMeta(info.type);
             return (
               <View
                 key={day}
@@ -154,6 +163,15 @@ export default function Widgets() {
                     ◷ שעות חריגות
                   </T>
                 )}
+                {meta.secondaryBg && (
+                  <View
+                    style={{
+                      height: 7,
+                      borderRadius: 4,
+                      backgroundColor: meta.secondaryBg,
+                    }}
+                  />
+                )}
               </View>
             );
           })}
@@ -164,7 +182,7 @@ export default function Widgets() {
         {Array.from({ length: 7 }, (_, index) => {
           const day = addDays(today, index),
             info = dayInfo(data, day),
-            meta = META[info.type],
+            meta = widgetMeta(info.type),
             name = data.showHeb ? holiday(day) : "";
           return (
             <Row
@@ -207,6 +225,16 @@ export default function Widgets() {
                   <T size={10} weight="bold" style={{ color: meta.vividInk }}>
                     ◷ שעות חריגות
                   </T>
+                )}
+                {meta.secondaryBg && (
+                  <View
+                    style={{
+                      height: 6,
+                      borderRadius: 4,
+                      marginTop: 3,
+                      backgroundColor: meta.secondaryBg,
+                    }}
+                  />
                 )}
               </View>
             </Row>

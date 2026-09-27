@@ -53,8 +53,8 @@ export default function ShiftCard({
       {meta.secondaryBg && (
         <View
           style={{
-            height: 4,
-            borderRadius: 2,
+            height: 8,
+            borderRadius: 5,
             backgroundColor: meta.secondaryBg,
           }}
         />

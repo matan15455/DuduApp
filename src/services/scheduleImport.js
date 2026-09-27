@@ -3,9 +3,8 @@ import Constants from "expo-constants";
 import { extractSchedule, reviewResponse } from "../lib/scheduleImport";
 import { TYPES } from "../lib/schedule";
 
-export const IMPORT_MODEL = "gemini-3.8-flash";
-function developmentApiKey() {
-  if (!__DEV__) return "";
+export const IMPORT_MODEL = "gemini-3.1-flash-lite";
+function geminiApiKey() {
   const envKey = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
   const configKey = Constants.expoConfig?.extra?.localGeminiApiKey;
   return (
@@ -14,8 +13,7 @@ function developmentApiKey() {
   );
 }
 export function importSetupError() {
-  if (!__DEV__) return "Import is available in development builds only";
-  if (!developmentApiKey()) return "Missing EXPO_PUBLIC_GEMINI_API_KEY";
+  if (!geminiApiKey()) return "Missing EXPO_PUBLIC_GEMINI_API_KEY";
   return "";
 }
 
@@ -97,7 +95,7 @@ export async function recognizeSchedule(source, data, signal) {
         signal: controller.signal,
         headers: {
           "Content-Type": "application/json",
-          "x-goog-api-key": developmentApiKey(),
+          "x-goog-api-key": geminiApiKey(),
         },
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: instructions }] },

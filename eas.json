@@ -8,7 +8,7 @@
       "ios": { "simulator": true }
     },
     "preview": { "distribution": "internal" },
-    "production": { "autoIncrement": true }
+    "production": { "autoIncrement": true, "environment": "production" }
   },
   "submit": { "production": {} }
 }
