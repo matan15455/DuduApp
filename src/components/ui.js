@@ -159,6 +159,7 @@ export function Screen({
   scroll = true,
   footer = undefined,
   header = undefined,
+  keyboardAware = false,
 }) {
   const { theme, error, retrySave } = useApp();
   const Content = scroll ? ScrollView : View;
@@ -179,6 +180,8 @@ export function Screen({
         {...(scroll
           ? {
               keyboardShouldPersistTaps: "handled",
+              automaticallyAdjustKeyboardInsets: keyboardAware,
+              keyboardDismissMode: keyboardAware ? "interactive" : "none",
               style: { flex: 1, minHeight: 0, overflow: "hidden" },
               contentContainerStyle: [s.screen, style],
             }

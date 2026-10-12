@@ -1,5 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Alert, Switch, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  Switch,
+  TextInput,
+  View,
+} from "react-native";
 import { router } from "expo-router";
 import { useApp } from "../state/AppProvider";
 import { DOW, iso, META, parse, shortDate, TYPES } from "../lib/schedule";
@@ -47,7 +53,8 @@ function ReviewDay({ row, data, onChange, onEditing }) {
           size={15}
           style={[s.grow, { color: meta?.vividInk || theme.ink }]}
         >
-          {DOW[parse(row.day).getDay()]} {shortDate(row.day)} · {rowLabel(row)}
+          {DOW[parse(row.day).getDay()]} {shortDate(row.day)}.
+          {row.day.slice(0, 4)} · {rowLabel(row)}
         </T>
         {!editing && (
           <Button
@@ -63,6 +70,17 @@ function ReviewDay({ row, data, onChange, onEditing }) {
       </Row>
       {editing && (
         <>
+          {row.conflict && (
+            <T size={13} style={{ color: meta?.vividInk || theme.ink }}>
+              יש כמה גרסאות לתאריך זה:{" "}
+              {[row, ...(row.alternatives || [])]
+                .map(
+                  (item) =>
+                    `${item.sheetName}: ${item.change || (item.red ? "אדום" : item.base)}`,
+                )
+                .join(" · ")}
+            </T>
+          )}
           <View style={s.wrap}>
             {TYPES.map((type) => (
               <Button
@@ -135,6 +153,22 @@ export default function ImportSchedule() {
   const [source, setSource] = useState(null),
     [rows, setRows] = useState([]);
   const [editingDays, setEditingDays] = useState([]);
+  const [page, setPage] = useState(0);
+  const [rangeMode, setRangeMode] = useState("months");
+  const [monthCount, setMonthCount] = useState("1");
+  const validRange =
+    rangeMode === "all" ||
+    (/^\d{1,3}$/.test(monthCount) &&
+      Number(monthCount) >= 1 &&
+      Number(monthCount) <= 120);
+  function resetRange() {
+    setSource(null);
+    setRows([]);
+    setEditingDays([]);
+    setPage(0);
+    setSaved(false);
+    setError("");
+  }
   const [busy, setBusy] = useState(""),
     [error, setError] = useState(""),
     [saved, setSaved] = useState(false);
@@ -162,12 +196,15 @@ export default function ImportSchedule() {
     setBusy("…");
     setError("");
     try {
-      const picked = await pickSchedule();
+      const picked = await pickSchedule(
+        rangeMode === "all" ? null : Number(monthCount),
+      );
       if (picked && alive.current) {
         setSource(picked);
         setRows([]);
         setEditingDays([]);
         setSaved(false);
+        setPage(0);
       }
     } catch (e) {
       if (alive.current) setError(e.message);
@@ -199,8 +236,14 @@ export default function ImportSchedule() {
         source,
         latest.current,
         request.current.signal,
+        (done, total) => {
+          if (alive.current) setBusy(`זוהו ${done} מתוך ${total} ימים`);
+        },
       );
-      if (alive.current) setRows(result);
+      if (alive.current) {
+        setRows(result);
+        setPage(0);
+      }
     } catch (e) {
       if (alive.current) setError(e.message);
     } finally {
@@ -210,32 +253,41 @@ export default function ImportSchedule() {
     }
   }
   function confirm() {
-    Alert.alert("לעדכן את הלוח?", `${selected.length} ימים`, [
-      { text: "ביטול", style: "cancel" },
-      {
-        text: "עדכן",
-        onPress: () => {
-          if (locked.current) return;
-          if (!sourceCurrent()) {
-            setError("בחר את הקובץ מחדש");
-            return;
-          }
-          try {
-            const updated = applyImport(latest.current, rows, source.sheetName);
-            update(updated);
-            setSaved(true);
-            setRows([]);
-            notify(updated === latest.current ? "אין שינויים" : "הלוח עודכן");
-          } catch (e) {
-            setError(e.message);
-          }
+    Alert.alert(
+      "לעדכן את הלוח?",
+      `${selected.length} ימים · ${source.from} – ${source.to}`,
+      [
+        { text: "ביטול", style: "cancel" },
+        {
+          text: "עדכן",
+          onPress: () => {
+            if (locked.current) return;
+            if (!sourceCurrent()) {
+              setError("בחר את הקובץ מחדש");
+              return;
+            }
+            try {
+              const updated = applyImport(
+                latest.current,
+                rows,
+                source.sheetName,
+              );
+              update(updated);
+              setSaved(true);
+              setRows([]);
+              notify(updated === latest.current ? "אין שינויים" : "הלוח עודכן");
+            } catch (e) {
+              setError(e.message);
+            }
+          },
         },
-      },
-    ]);
+      ],
+    );
   }
   return (
     <Screen
       title="ייבוא סידור עבודה"
+      keyboardAware
       footer={
         rows.length > 0 ? (
           <Button
@@ -259,12 +311,83 @@ export default function ImportSchedule() {
         icon="arrow-right"
         onPress={() => router.back()}
       />
+      <Card>
+        <Row>
+          <Button
+            title="חודשים קרובים"
+            selected={rangeMode === "months"}
+            disabled={!!busy}
+            style={s.grow}
+            onPress={() => {
+              if (rangeMode !== "months") {
+                setRangeMode("months");
+                resetRange();
+              }
+            }}
+          />
+          <Button
+            title="עד סוף הקובץ"
+            selected={rangeMode === "all"}
+            disabled={!!busy}
+            style={s.grow}
+            onPress={() => {
+              if (rangeMode !== "all") {
+                setRangeMode("all");
+                resetRange();
+              }
+            }}
+          />
+        </Row>
+        {rangeMode === "months" && (
+          <Row>
+            <Button
+              title="−"
+              disabled={!!busy || Number(monthCount) <= 1}
+              onPress={() => {
+                setMonthCount(String(Math.max(1, Number(monthCount) - 1)));
+                resetRange();
+              }}
+            />
+            <TextInput
+              accessibilityLabel="מספר החודשים לייבוא מהיום"
+              keyboardType="number-pad"
+              value={monthCount}
+              maxLength={3}
+              editable={!busy}
+              onChangeText={(value) => {
+                setMonthCount(value.replace(/\D/g, ""));
+                resetRange();
+              }}
+              style={{
+                flex: 1,
+                textAlign: "center",
+                color: theme.ink,
+                backgroundColor: theme.soft,
+                borderRadius: 12,
+                padding: 12,
+                fontSize: 22,
+              }}
+            />
+            <Button
+              title="+"
+              disabled={!!busy || Number(monthCount) >= 120}
+              onPress={() => {
+                setMonthCount(String(Math.min(120, Number(monthCount) + 1)));
+                resetRange();
+              }}
+            />
+          </Row>
+        )}
+        {rangeMode === "all" && (
+          <T size={13} muted>מהיום עד סוף הקובץ</T>
+        )}
+      </Card>
       <Row>
         <Button
           title={source ? "קובץ אחר" : "בחר קובץ Excel"}
           icon="upload"
           style={s.grow}
-          disabled={!!busy}
+          disabled={!!busy || !validRange}
           onPress={choose}
         />
         {source && (
@@ -279,12 +402,16 @@ export default function ImportSchedule() {
       </Row>
       {source && (
         <T size={14} muted>
-          {source.fileName} · {shortDate(source.from)}–{shortDate(source.to)}
+          {source.fileName} · {source.from} – {source.to} ·{" "}
+          {source.entries.length} ימים
         </T>
       )}
       {!!busy && (
         <Row>
           <ActivityIndicator color={theme.accent} />
+          <T style={s.grow} size={14}>
+            {busy}
+          </T>
           <Button title="ביטול" onPress={() => request.current?.abort()} />
         </Row>
       )}
@@ -298,12 +425,26 @@ export default function ImportSchedule() {
             {selected.length}/{rows.length}
             {unresolved ? ` · ${unresolved} לבדיקה` : ""}
           </T>
+          <Row>
+            <Button
+              title="הקודמים"
+              disabled={page === 0 || editingDays.length > 0}
+              onPress={() => setPage(page - 1)}
+            />
+            <T style={[s.grow, s.center]}>
+              {page + 1} / {Math.ceil(rows.length / 31)}
+            </T>
+            <Button
+              title="הבאים"
+              disabled={
+                (page + 1) * 31 >= rows.length || editingDays.length > 0
+              }
+              onPress={() => setPage(page + 1)}
+            />
+          </Row>
           {[...rows]
-            .sort(
-              (a, b) =>
-                Number(b.needsReview) - Number(a.needsReview) ||
-                a.day.localeCompare(b.day),
-            )
+            .sort((a, b) => a.day.localeCompare(b.day))
+            .slice(page * 31, (page + 1) * 31)
             .map((row) => (
               <ReviewDay
                 key={row.day}

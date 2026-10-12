@@ -1,6 +1,6 @@
 /** @typedef {'morning'|'afternoon'|'night'|'off'|'morningAfternoon'|'afternoonNight'|'special'|'taken'} ShiftType */
 /** @typedef {{type?: ShiftType, start?: string, end?: string, note?: string}} Override */
-/** @typedef {{version: number, configured: boolean, cycleStart: string, hours: Record<string, string[]>, overrides: Record<string, Override>, reminder: {on: boolean, mode: string, lead: number, at: string}, showHeb: boolean, theme: string}} AppData */
+/** @typedef {{version: number, configured: boolean, cycleStart: string, hours: Record<string, string[]>, overrides: Record<string, Override>, salaryAdjustments?: Record<string, number>, reminder: {on: boolean, mode: string, lead: number, at: string}, showHeb: boolean, theme: string}} AppData */
 
 export const TYPES = /** @type {ShiftType[]} */ ([
   "morning",
@@ -127,6 +127,7 @@ export function initialData() {
       afternoonNight: ["14:00", "06:00"],
     },
     overrides: {},
+    salaryAdjustments: {},
     reminder: { on: false, mode: "before", lead: 60, at: "20:00" },
     showHeb: true,
     theme: "system",
@@ -157,6 +158,7 @@ export function dayInfo(data, day) {
     base,
     type,
     work,
+    paidLeave: !work && base !== "off" && !!override.type,
     start,
     end,
     hours: work ? `${start}–${end}` : "ללא משמרת",

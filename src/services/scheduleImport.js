@@ -3,6 +3,62 @@ import { extractSchedule, reviewResponse } from "../lib/scheduleImport";
 
 const importUrl = () => (process.env.EXPO_PUBLIC_IMPORT_URL || "").trim();
 const importToken = () => (process.env.EXPO_PUBLIC_IMPORT_TOKEN || "").trim();
+
+function pause(ms, signal) {
+  return new Promise((resolve, reject) => {
+    const abort = () => {
+      clearTimeout(timer);
+      signal?.removeEventListener("abort", abort);
+      reject(new Error("בוטל"));
+    };
+    const timer = setTimeout(() => {
+      signal?.removeEventListener("abort", abort);
+      resolve(undefined);
+    }, ms);
+    signal?.addEventListener("abort", abort);
+    if (signal?.aborted) abort();
+  });
+}
+
+// Keep the deployed Worker's 35-day / 3-per-minute limits. No partial result
+// is returned on cancellation/failure and the calendar is never written here.
+export async function recognizeSchedule(
+  source,
+  data,
+  signal,
+  onProgress = (_done, _total) => {},
+) {
+  const result = [],
+    total = source.entries.length;
+  for (let offset = 0; offset < total;) {
+    if (signal?.aborted) throw new Error("בוטל");
+    if (offset) await pause(21000, signal);
+    onProgress(offset, total);
+    let count = Math.min(35, total - offset);
+    // Three bytes per UTF-16 code unit is a conservative UTF-8 upper bound.
+    // Leave headroom under the Worker's 32KB request limit.
+    while (
+      count > 1 &&
+      JSON.stringify({
+        entries: source.entries
+          .slice(offset, offset + count)
+          .map(({ day, base, change, red }) => ({ day, base, change, red })),
+      }).length *
+        3 >
+        30000
+    )
+      count--;
+    const rows = await recognizeBatch(
+      { ...source, entries: source.entries.slice(offset, offset + count) },
+      data,
+      signal,
+    );
+    result.push(...rows);
+    offset += count;
+    onProgress(result.length, total);
+  }
+  return result;
+}
 export function importSetupError() {
   try {
     const url = new URL(importUrl());
@@ -22,7 +78,7 @@ export function importSetupError() {
   return "";
 }
 
-export async function pickSchedule() {
+export async function pickSchedule(months = 1) {
   if (!requireOptionalNativeModule("ExpoDocumentPicker"))
     throw new Error("נדרשת בניית פיתוח חדשה כדי להוסיף את בוחר הקבצים.");
   const DocumentPicker = require("expo-document-picker");
@@ -39,7 +95,10 @@ export async function pickSchedule() {
     if (!/\.xlsx$/i.test(asset.name))
       throw new Error("בחר קובץ Excel בסיומת xlsx.");
     if (file.size > 5 * 1024 * 1024) throw new Error("בחר קובץ עד 5MB.");
-    return { ...extractSchedule(await file.bytes()), fileName: asset.name };
+    return {
+      ...extractSchedule(await file.bytes(), new Date(), months),
+      fileName: asset.name,
+    };
   } finally {
     // Delete only the picker-owned cache copy, never the user's source file.
     if (
@@ -56,7 +115,7 @@ export async function pickSchedule() {
   }
 }
 
-export async function recognizeSchedule(source, data, signal) {
+async function recognizeBatch(source, data, signal) {
   const setupError = importSetupError();
   if (setupError) throw new Error(setupError);
   const controller = new AbortController();

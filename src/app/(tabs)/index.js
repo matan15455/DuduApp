@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef, useState } from "react";
+import React, { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Modal, Pressable, ScrollView, View } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
 import { router } from "expo-router";
@@ -7,6 +7,7 @@ import { addDays, addMonth, META, parse, shortDate } from "../../lib/schedule";
 import { hebrewDate } from "../../lib/hebrew";
 import { Button, Card, Row, s, Screen, T } from "../../components/ui";
 import CalendarPage from "../../components/CalendarPage";
+import { estimateSalary, money } from "../../lib/salary";
 
 function LegendItem({ type }) {
   const meta = META[type];
@@ -55,6 +56,10 @@ export default function Calendar() {
   const month = anchor.slice(0, 7) + "-01",
     weekStart = addDays(anchor, -parse(anchor).getDay());
   const pageKey = `${mode}-${anchor}-${size.width}`;
+  const salary = useMemo(
+    () => estimateSalary(data, month.slice(0, 7)),
+    [data, month],
+  );
   useLayoutEffect(() => {
     settledPage.current = "";
   }, [pageKey]);
@@ -76,15 +81,25 @@ export default function Calendar() {
               onPress={() => router.push("/import")}
             />
             <Button
+              title="שכר"
+              style={{ paddingHorizontal: 8, minWidth: 48 }}
+              onPress={() =>
+                router.push({
+                  pathname: "/salary",
+                  params: { month: anchor.slice(0, 7) },
+                })
+              }
+            />
+            <Button
               title="חודש"
               selected={mode === "month"}
-              style={s.grow}
+              style={[s.grow, { paddingHorizontal: 6, minWidth: 0 }]}
               onPress={() => setMode("month")}
             />
             <Button
               title="שבוע"
               selected={mode === "week"}
-              style={s.grow}
+              style={[s.grow, { paddingHorizontal: 6, minWidth: 0 }]}
               onPress={() => setMode("week")}
             />
           </Row>
@@ -131,6 +146,18 @@ export default function Calendar() {
               onPress={() => setLegendOpen(true)}
             />
           </Row>
+          {mode === "month" && (
+            <T
+              size={15}
+              weight="bold"
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              style={s.center}
+            >
+              שכר משוער · {money(salary.total)}
+              {salary.unresolved.length ? " · חלקי" : ""}
+            </T>
+          )}
         </View>
       }
       style={{ paddingHorizontal: 12, paddingTop: 8, paddingBottom: 8, gap: 8 }}

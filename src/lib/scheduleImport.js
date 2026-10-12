@@ -1,5 +1,13 @@
 import * as XLSX from "xlsx";
-import { addDays, dayInfo, iso, META, parse, TYPES } from "./schedule.js";
+import {
+  addDays,
+  addMonth,
+  dayInfo,
+  iso,
+  META,
+  parse,
+  TYPES,
+} from "./schedule.js";
 
 export const MONTHS = [
   "ינואר",
@@ -73,7 +81,10 @@ function extractSheet(bytes, sheetName, year, month) {
   if (bounds.e.r > 249 || bounds.e.c > 99)
     throw new Error("הגיליון גדול מהמבנה הנתמך (250 שורות ו־100 עמודות).");
   const people = Object.keys(sheet).filter((address) => {
-    if (address.startsWith("!") || compact(sheet[address]?.v) !== "דודו")
+    if (
+      address.startsWith("!") ||
+      !/^דודו(?:\d+)?$/.test(compact(sheet[address]?.v))
+    )
       return false;
     const position = XLSX.utils.decode_cell(address);
     // His name can also appear as someone else's backup. Only a labelled
@@ -137,7 +148,7 @@ function extractSheet(bytes, sheetName, year, month) {
       .replace(/^יום/, "");
     if (wd !== weekdays[parse(day).getDay()])
       throw new Error(
-        `יום השבוע בתאריך ${day} אינו תואם לשנה הנוכחית. בדוק שהקובץ מעודכן.`,
+        `יום השבוע בתאריך ${day} אינו תואם לשנת ${year} שנקבעה לגיליון. בדוק את השנה בשם הגיליון ואת שורת הימים.`,
       );
     const base = cellAt(sheet, shiftsRow, col),
       change = cellAt(sheet, person.r, col);
@@ -157,83 +168,89 @@ function extractSheet(bytes, sheetName, year, month) {
   return entries;
 }
 
-const WINDOW_DAYS = 30;
-
-// Reads every sheet needed to cover today + 29 days. Years in the workbook are
-// legacy template content; dates use the device year.
-export function extractSchedule(bytes, now = new Date()) {
+// Tab order is arbitrary. Accept both "November 26" and "November 2026".
+// Undated/legacy sheets use the current year, never an inferred rollover.
+export function extractSchedule(bytes, now = new Date(), monthsAhead = 1) {
   if (bytes.length > 5 * 1024 * 1024) throw new Error("בחר קובץ עד 5MB.");
+  if (
+    monthsAhead !== null &&
+    (!Number.isInteger(monthsAhead) || monthsAhead < 1 || monthsAhead > 120)
+  )
+    throw new Error("בחר מספר חודשים בין 1 ל־120.");
+  const from = iso(now),
+    to = monthsAhead === null ? null : addDays(addMonth(from, monthsAhead), -1);
+  const workbookYear = now.getFullYear();
   const names = XLSX.read(bytes, {
     type: "array",
     bookSheets: true,
   }).SheetNames;
-  const created = iso(now);
-  const windowDays = Array.from({ length: WINDOW_DAYS }, (_, i) =>
-    addDays(created, i),
-  );
-  const first = parse(windowDays[0]),
-    last = parse(windowDays[WINDOW_DAYS - 1]);
-  const end = new Date(last.getFullYear(), last.getMonth() + 1, 1);
   const byDay = new Map(),
     used = [],
-    errors = [];
-  for (
-    let d = new Date(first.getFullYear(), first.getMonth(), 1);
-    d <= end;
-    d = new Date(d.getFullYear(), d.getMonth() + 1, 1)
-  ) {
-    const matches = names.filter((name) =>
-      clean(name)
-        .split(/[\s\d\-_./]+/)
-        .includes(MONTHS[d.getMonth()]),
-    );
-    if (matches.length > 1) {
-      errors.push(
-        new Error(`נמצאו כמה גיליונות ${MONTHS[d.getMonth()]}. השאר אחד.`),
+    seenMonths = new Set();
+  for (const name of names) {
+    const words = clean(name).split(/[\s\d\-_./]+/);
+    const months = MONTHS.map((label, index) =>
+      words.includes(label) ? index : -1,
+    ).filter((index) => index >= 0);
+    if (!months.length) continue;
+    if (months.length !== 1)
+      throw new Error("שם גיליון כולל יותר מחודש אחד: " + name);
+    const years = (clean(name).match(/\d+/g) || [])
+      .filter((token) => /^(?:\d{2}|20\d{2})$/.test(token))
+      .map((token) =>
+        token.length === 2 ? 2000 + Number(token) : Number(token),
       );
-      continue;
-    }
-    if (!matches.length) continue;
+    if (new Set(years).size > 1)
+      throw new Error("שנת גיליון אינה ברורה: " + name);
+    const month = months[0];
+    const year = years[0] >= workbookYear ? years[0] : workbookYear;
+    // Skip irrelevant sheets before looking for the employee or validating rows.
+    const monthEnd = iso(new Date(year, month + 1, 0, 12));
+    const earliest = iso(new Date(year, month - 1, 1, 12));
+    if (monthEnd < from || (to && earliest > to)) continue;
+    const key = year + "-" + month;
+    if (seenMonths.has(key))
+      throw new Error("נמצאו גיליונות כפולים לאותו חודש: " + name);
+    seenMonths.add(key);
+    let entries;
     try {
-      const entries = extractSheet(
-        bytes,
-        matches[0],
-        d.getFullYear(),
-        d.getMonth(),
-      );
-      used.push(matches[0]);
-      for (const entry of entries) {
-        const seen = byDay.get(entry.day);
-        if (!seen) byDay.set(entry.day, entry);
-        else if (
-          seen.base !== entry.base ||
-          seen.change !== entry.change ||
-          seen.red !== entry.red
-        )
-          seen.conflict = true;
-      }
+      entries = extractSheet(bytes, name, year, month);
     } catch (error) {
-      errors.push(error);
+      throw new Error(name + ": " + error.message);
+    }
+    used.push(name);
+    for (const entry of entries) {
+      if (entry.day < from || (to && entry.day > to)) continue;
+      // Empty cells are not shifts; never fill them from the repeating cycle.
+      if (!entry.base && !entry.change && !entry.red) continue;
+      const seen = byDay.get(entry.day);
+      const item = { ...entry, sheetName: name };
+      if (!seen) byDay.set(entry.day, item);
+      else if (
+        seen.base !== entry.base ||
+        seen.change !== entry.change ||
+        seen.red !== entry.red
+      ) {
+        seen.conflict = true;
+        seen.alternatives = [...(seen.alternatives || []), item];
+      }
     }
   }
-  const entries = windowDays
-    .filter((day) => byDay.has(day))
-    .map((day) => byDay.get(day));
+  const entries = [...byDay.values()].sort((a, b) =>
+    a.day.localeCompare(b.day),
+  );
   if (!entries.length)
-    throw errors[0] || new Error("אין בקובץ ימים מ־30 הימים הקרובים.");
-  // A sheet that exists but cannot be read must never silently shrink the range.
-  if (errors.length && entries.length < WINDOW_DAYS) throw errors[0];
+    throw new Error("לא נמצאו משמרות בטווח שנבחר מהיום והלאה.");
   return {
     sheetName: used.join(", "),
-    year: now.getFullYear(),
-    created,
+    year: workbookYear,
+    created: iso(now),
     from: entries[0].day,
     to: entries[entries.length - 1].day,
     employee: "דודו",
     entries,
   };
 }
-
 export function sourceMeaning(entry) {
   const text = compact(entry.change || (entry.red ? "ח" : entry.base));
   if (codes[text]) return { type: codes[text], start: "", end: "" };
@@ -348,6 +365,7 @@ export function applyImport(data, rows, sheetName) {
     };
     if (
       current.type === row.type &&
+      overrides[row.day]?.type === row.type &&
       current.start === (row.type === "off" ? "" : row.start) &&
       current.end === (row.type === "off" ? "" : row.end)
     )

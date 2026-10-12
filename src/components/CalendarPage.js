@@ -9,6 +9,7 @@ import { Row, s, T } from "./ui";
 
 function Markers({ info }) {
   const { theme } = useApp();
+  if (!info.typeChanged && !info.note) return null;
   return (
     <Row style={{ gap: 3, minHeight: 22, marginTop: "auto" }}>
       {info.typeChanged && (
@@ -72,10 +73,6 @@ export default function CalendarPage({ anchor, mode, height, width }) {
   ).getDate();
   const weekStart = addDays(anchor, -parse(anchor).getDay());
   const weeks = Math.ceil((count + first.getDay()) / 7);
-  const cellHeight = Math.max(
-    120 * textScale,
-    (height - headerHeight - 6 - (weeks - 1) * 4) / weeks,
-  );
   const cells =
     mode === "week"
       ? Array.from({ length: 7 }, (_, i) => addDays(weekStart, i))
@@ -84,6 +81,24 @@ export default function CalendarPage({ anchor, mode, height, width }) {
             ? null
             : addDays(month, i - first.getDay()),
         );
+  // Keep columns uniform, reserving extra height only for content in this month.
+  const contentHeight = Math.max(
+    88,
+    ...cells.filter(Boolean).map((day) => {
+      const info = dayInfo(data, day);
+      return (
+        76 +
+        (info.typeChanged || info.note ? 22 : 0) +
+        (META[info.type].secondaryBg ? 9 : 0) +
+        (info.customHours ? 12 : 0) +
+        (data.showHeb && holiday(day) ? 12 : 0)
+      );
+    }),
+  );
+  const cellHeight = Math.max(
+    contentHeight * textScale,
+    (height - headerHeight - 6 - (weeks - 1) * 4) / weeks,
+  );
   const open = (day) =>
     router.push({ pathname: "/day", params: { date: day } });
   // Only compact screens / enlarged text need vertical scrolling; the outer
@@ -199,9 +214,19 @@ export default function CalendarPage({ anchor, mode, height, width }) {
                       <Feather name={meta.icon} size={12} color={color} />
                     </Row>
                     <T
+                      size={10}
+                      weight="bold"
+                      numberOfLines={1}
+                      adjustsFontSizeToFit
+                      style={{ color }}
+                    >
+                      {DOW[parse(day).getDay()]}
+                    </T>
+                    <T
                       size={11}
                       weight="heavy"
                       numberOfLines={meta.secondaryBg ? 2 : 1}
+                      adjustsFontSizeToFit
                       style={{ color }}
                     >
                       {meta.short}
@@ -226,16 +251,14 @@ export default function CalendarPage({ anchor, mode, height, width }) {
                         >
                           {info.hours}
                         </T>
-                        <T size={8} weight="bold" style={{ color }}>
-                          ◷ חריגות
-                        </T>
                       </View>
                     )}
                     {!!name && (
                       <T
                         size={9}
                         muted
-                        numberOfLines={2}
+                        numberOfLines={1}
+                        adjustsFontSizeToFit
                         style={{ lineHeight: 11, color }}
                       >
                         {name}

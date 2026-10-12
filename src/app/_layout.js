@@ -75,6 +75,7 @@ function Navigator() {
         />
         <Stack.Screen name="widgets" />
         <Stack.Screen name="import" />
+        <Stack.Screen name="salary" />
       </Stack>
       {!!toast && (
         <View
